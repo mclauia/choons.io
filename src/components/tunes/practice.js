@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-    Button, Alert
+    Button, Alert, FormGroup, InputGroup, Row, Col, Form, FormControl
 } from 'react-bootstrap';
 import format from 'date-fns/format';
 import { updateTune } from '../../firebase';
@@ -10,7 +10,8 @@ class TunePractice extends Component {
     state = {
         isPracticing: false,
         practiceStart: null,
-        practiceEnd: null
+        practiceEnd: null,
+        practiceValue: ''
     }
 
     startPractice = () => {
@@ -28,7 +29,21 @@ class TunePractice extends Component {
         };
         if (learnt) {
             nextTune.dateLearnt = Date.now();
+            nextTune.stage = 'drill';
         }
+        this.props.persistTuneChanges(nextTune)
+    }
+
+    addPracticeTime = () => {
+        const { tune } = this.props;
+        const practiceEnd = Date.now();
+        const nextSecondsPracticed = (tune.secondsPracticed || 0) + (parseFloat(this.state.practiceValue) * 60);
+        const nextTune = {
+            ...tune,
+            lastPracticedTimestamp: practiceEnd,
+            secondsPracticed: nextSecondsPracticed
+        };
+        this.setState({ practiceValue: null })
         this.props.persistTuneChanges(nextTune)
     }
 
@@ -45,7 +60,22 @@ class TunePractice extends Component {
                 {secondsPracticed && `, for a total of ${(secondsPracticed / 60).toFixed(2)} minutes`}
             </p>}
 
-            {!isPracticing && <Button bsStyle="primary" onClick={this.startPractice}>git practicing</Button>}
+            {!isPracticing && <Row><Col md={12}><Form horizontal>
+                <InputGroup>
+                    <InputGroup.Button>
+                        <Button bsStyle="primary" onClick={this.startPractice}>git practicing</Button>
+                    </InputGroup.Button>
+                    <FormControl
+                        value={this.state.practiceValue}
+                        type="text"
+                        onChange={(e) => this.setState({ practiceValue: e.target.value })}
+                    />
+                    <InputGroup.Button>
+                        <Button bsStyle="success" onClick={this.addPracticeTime}>Add time</Button>
+                    </InputGroup.Button>
+                </InputGroup>
+
+            </Form></Col></Row>}
             {isPracticing && <div>
                 <h3>Keep practicing!</h3>
                 <br />

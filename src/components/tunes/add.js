@@ -30,6 +30,8 @@ class TuneAdd extends Component {
             realmValue: cachedTuneData.realm || '',
             sourceValue: cachedTuneData.source || '',
             sessionValue: cachedTuneData.session || '',
+            videoValue: '',
+            stageValue: '',
             notesValue: '',
         }
     }
@@ -43,7 +45,9 @@ class TuneAdd extends Component {
             realm: this.state.realmValue,
             source: this.state.sourceValue,
             session: this.state.sessionValue,
+            video: this.state.videoValue,
             notes: this.state.notesValue,
+            stage: this.state.stageValue || 'learn',
             dateAdded: Date.now()
         });
         this.props.goBack();
@@ -149,6 +153,8 @@ class TuneAdd extends Component {
                         <FormControl
                             value={this.state.sourceValue}
                             type="text"
+                            name="source"
+                            autoComplete={true}
                             onChange={(e) => {
                                 this.setState({ sourceValue: e.target.value })
                                 localStorage.set(`CHOONS/newTune/source`, e.target.value)
@@ -161,11 +167,37 @@ class TuneAdd extends Component {
                         <FormControl
                             value={this.state.sessionValue}
                             type="text"
+                            name="session"
+                            autoComplete={true}
                             onChange={(e) => {
                                 this.setState({ sessionValue: e.target.value })
                                 localStorage.set(`CHOONS/newTune/session`, e.target.value)
                             }}
                         />
+                    </FormGroup>
+                    <FormGroup controlId="chapterShortDesc">
+                        <ControlLabel>Video URL</ControlLabel>
+                        {' '}
+                        <FormControl
+                            value={this.state.videoValue}
+                            type="text"
+                            onChange={(e) => this.setState({ videoValue: e.target.value })}
+                        />
+                    </FormGroup>
+                    <FormGroup controlId="chapterShortDesc">
+                        <ControlLabel>Stage (if not new)</ControlLabel>
+                        {' '}
+                        <FormControl
+                            componentClass="select"
+                            value={this.state.stageValue}
+                            onChange={(e) => {
+                                this.setState({ stageValue: e.target.value })
+                            }}
+                        >
+                            <option value="">-- Choose Stage --</option>
+                            <option value="enhance">Work on it</option>
+                            <option value="drill">Drill it</option>
+                        </FormControl>
                     </FormGroup>
                     <FormGroup controlId="chapterShortDesc">
                         <ControlLabel>Notes</ControlLabel>

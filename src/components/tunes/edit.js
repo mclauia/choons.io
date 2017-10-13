@@ -153,6 +153,8 @@ class TuneEdit extends Component {
                         <FormControl
                             value={this.state.sourceValue}
                             type="text"
+                            name="source"
+                            autoComplete={'on'}
                             onChange={(e) => {
                                 this.setState({ sourceValue: e.target.value })
                             }}
@@ -164,6 +166,8 @@ class TuneEdit extends Component {
                         <FormControl
                             value={this.state.sessionValue}
                             type="text"
+                            name="session"
+                            autoComplete={'on'}
                             onChange={(e) => {
                                 this.setState({ sessionValue: e.target.value })
                             }}

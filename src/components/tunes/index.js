@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Route, Link } from 'react-router-dom';
 import {
+    Button,
     Row, Col, Table,
     ButtonToolbar, ToggleButtonGroup, ToggleButton,
 } from 'react-bootstrap';
@@ -32,16 +33,22 @@ class Tunes extends Component {
                 this.props.pushRoute(`/tunes`)
             }
         }
+        const setRealms = (selection) => {
+            this.props.pushRoute(`/tunes/filter/realm/${selection}`)
+        }
         return (
             <Row>
                 <Col xs={12} md={12}>
                     <Route exact path="/tunes" render={(props) => {
                         return (
-                            <div>
+                            <Row><Col xs={12} md={12}>
                                 <h1>All Choons</h1>
                                 <TuneNav add={true} />
-                                <FilterFlags flags={''} onSelect={setFlags} />
-                                <br />
+                                <Row className="pad-butt"><Col xs={12} md={12}>
+                                    <div className="pull-left" style={{ marginRight: 10 }}><FilterFlags flags={''} onSelect={setFlags} /></div>
+                                    <div className="pull-left"><FilterRealms onSelect={setRealms} /></div>
+                                </Col></Row>
+
                                 <Typeahead
                                     onChange={(selections) => {
                                         this.props.pushRoute(`/tunes/view/${selections[0].id}`)
@@ -53,7 +60,7 @@ class Tunes extends Component {
                                 />
                                 <br />
                                 <TunesTable tunes={sort(tunes).by('name')}/>
-                            </div>
+                            </Col></Row>
                         )
                     }}/>
                     <Route path="/tunes/byFlag/:flags" render={({match:{params: {flags}}}) => (
@@ -98,6 +105,20 @@ function FilterFlags({ flags, onSelect }) {
         </ToggleButtonGroup>
     </ButtonToolbar>
 }
+
+function FilterRealms({ onSelect }) {
+    return <ButtonToolbar>
+        <ToggleButtonGroup type="radio"
+            name="realmFilter"
+            value={null}
+            onChange={onSelect}>
+            <ToggleButton value={'quebecois'}>Quebecois</ToggleButton>
+            <ToggleButton value={'irish'}>Irish</ToggleButton>
+            <ToggleButton value={'scottish'}>Scottish</ToggleButton>
+        </ToggleButtonGroup>
+    </ButtonToolbar>
+}
+
 function TunesTable({ tunes }) {
     return <Table striped bordered hover responsive>
         <thead>
@@ -115,7 +136,10 @@ function TunesTable({ tunes }) {
             {tunes.toArray().map((tune, i) =>
                 <tr key={tune.id}>
                     <td>{i+1}</td>
-                    <td><Link to={`/tunes/view/${tune.id}`}>{tune.name}</Link></td>
+                    <td>
+                        <Link to={`/tunes/edit/${tune.id}`}><Button bsSize="small" className="pull-right">Edit</Button></Link>
+                        <Link to={`/tunes/view/${tune.id}`}>{tune.name}</Link>
+                    </td>
                     <td><TuneFlags tune={tune} /></td>
                     <td><Link to={`/tunes/filter/type/${tune.type}`}>{tune.type}</Link></td>
                     <td><Link to={`/tunes/filter/musicKey/${tune.musicKey}`}>{tune.musicKey}</Link></td>

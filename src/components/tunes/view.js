@@ -25,10 +25,10 @@ export default function TuneView({ tune }) {
         <TunePractice tune={tune} />
         <Table striped bordered hover responsive>
             <tbody>
-                <tr>
+                {!!tune.aliases && <tr>
                     <td><strong>AKA</strong></td>
                     <td>{tune.aliases}</td>
-                </tr>
+                </tr>}
                 <tr>
                     <td><strong>Type</strong></td>
                     <td>{tune.type}</td>
@@ -41,18 +41,18 @@ export default function TuneView({ tune }) {
                     <td><strong>Stage</strong></td>
                     <td>{tune.stage}</td>
                 </tr>
-                <tr>
+                {!!tune.era && <tr>
                     <td><strong>Era</strong></td>
                     <td>{tune.era}</td>
-                </tr>
-                <tr>
+                </tr>}
+                {!!tune.composer && <tr>
                     <td><strong>Composer</strong></td>
                     <td>{tune.composer}</td>
-                </tr>
-                <tr>
+                </tr>}
+                {!!tune.dateLearnt && <tr>
                     <td><strong>Date Learnt</strong></td>
                     <td>{format(tune.dateLearnt, 'MMMM Do YYYY')}</td>
-                </tr>
+                </tr>}
                 <tr>
                     <td><strong>Videos</strong></td>
                     <td>
@@ -64,18 +64,18 @@ export default function TuneView({ tune }) {
                     <td><strong>Source</strong></td>
                     <td>{tune.source}</td>
                 </tr>
-                <tr>
+                {!!tune.dots && <tr>
                     <td><strong>Dots</strong></td>
                     <td>{tune.dots && <a href={tune.dots}>The dots</a>}</td>
-                </tr>
-                <tr>
+                </tr>}
+                {!!tune.session && <tr>
                     <td><strong>Sessions</strong></td>
-                    <td>{tune.sessions}</td>
-                </tr>
-                <tr>
+                    <td>{tune.session}</td>
+                </tr>}
+                {!!tune.notes && <tr>
                     <td><strong>Notes</strong></td>
                     <td>{tune.notes}</td>
-                </tr>
+                </tr>}
             </tbody>
         </Table>
     </div>)
