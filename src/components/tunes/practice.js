@@ -43,7 +43,7 @@ class TunePractice extends Component {
             lastPracticedTimestamp: practiceEnd,
             secondsPracticed: nextSecondsPracticed
         };
-        this.setState({ practiceValue: null })
+        this.setState({ practiceValue: '' })
         this.props.persistTuneChanges(nextTune)
     }
 
