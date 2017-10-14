@@ -15,7 +15,7 @@ import TuneView, { TuneFlags } from './view'
 import TuneEdit from './edit'
 import TuneNav from './nav'
 
-import { filter, sort } from './utils';
+import { filter, sort, pretty } from './utils';
 
 class Tunes extends Component {
     state = {
@@ -23,19 +23,22 @@ class Tunes extends Component {
         typeaheadSelections: []
     }
 
+    setFlags = (nextSelections) => {
+        if (nextSelections.length) {
+            this.props.pushRoute(`/tunes/byFlag/${nextSelections.join('')}`)
+        } else {
+            this.props.pushRoute(`/tunes`)
+        }
+    }
+    setRealms = (selection) => {
+        this.props.pushRoute(`/tunes/filter/realm/${selection}`)
+    }
+
+    goPractice = () => this.props.pushRoute(`/tunes/sort/lastPracticedTimestamp/desc`);
+
     render() {
         const { tunes, filterKey, filterValue } = this.props;
 
-        const setFlags = (nextSelections) => {
-            if (nextSelections.length) {
-                this.props.pushRoute(`/tunes/byFlag/${nextSelections.join('')}`)
-            } else {
-                this.props.pushRoute(`/tunes`)
-            }
-        }
-        const setRealms = (selection) => {
-            this.props.pushRoute(`/tunes/filter/realm/${selection}`)
-        }
         return (
             <Row>
                 <Col xs={12} md={12}>
@@ -45,8 +48,9 @@ class Tunes extends Component {
                                 <h1>All Choons</h1>
                                 <TuneNav add={true} />
                                 <Row className="pad-butt"><Col xs={12} md={12}>
-                                    <div className="pull-left" style={{ marginRight: 10 }}><FilterFlags flags={''} onSelect={setFlags} /></div>
-                                    <div className="pull-left"><FilterRealms onSelect={setRealms} /></div>
+                                    <div className="pull-left" style={{ marginRight: 10 }}><FilterFlags flags={''} onSelect={this.setFlags} /></div>
+                                    <div className="pull-left"><FilterRealms onSelect={this.setRealms} /></div>
+                                    <div className="pull-left"><Button onClick={this.goPractice} style={{ marginLeft: 10 }}>Practice</Button></div>
                                 </Col></Row>
 
                                 <Typeahead
@@ -67,8 +71,8 @@ class Tunes extends Component {
                         <div>
                             <h1>Some Choons</h1>
                             <TuneNav add={true} back={true} />
-                            <FilterFlags flags={flags} onSelect={setFlags} />
-
+                            <FilterFlags flags={flags} onSelect={this.setFlags} />
+                            <br />
                             <TunesTable tunes={sort(filter(tunes).byFlags(flags)).by('name')}/>
                         </div>
                     )}/>
@@ -77,6 +81,13 @@ class Tunes extends Component {
                             <h1>Some Choons</h1>
                             <TuneNav add={true} back={true} />
                             <TunesTable tunes={sort(filter(tunes).byKey(filterKey, filterValue)).by('name')}/>
+                        </div>
+                    )}/>
+                    <Route path="/tunes/sort/:sortKey?/:sortDir?" render={({match:{params: {sortKey, sortDir}}}) => (
+                        <div>
+                            <h1>Some Choons</h1>
+                            <TuneNav add={true} back={true} />
+                            <TunesTable tunes={sort(tunes.filter((tune) => tune[sortKey])).by(sortKey, sortDir)}/>
                         </div>
                     )}/>
                     <Route path="/tunes/view/:tuneId" render={({match:{params: {tuneId}}}) => (
@@ -125,11 +136,11 @@ function TunesTable({ tunes }) {
             <tr>
                 <th>#</th>
                 <th>Name</th>
-                <th>Flags</th>
                 <th>Type</th>
                 <th>Key</th>
                 <th>Stage</th>
                 <th>Realm</th>
+                <th>Source</th>
             </tr>
         </thead>
         <tbody>
@@ -138,13 +149,13 @@ function TunesTable({ tunes }) {
                     <td>{i+1}</td>
                     <td>
                         <Link to={`/tunes/edit/${tune.id}`}><Button bsSize="small" className="pull-right">Edit</Button></Link>
-                        <Link to={`/tunes/view/${tune.id}`}>{tune.name}</Link>
+                        <Link to={`/tunes/view/${tune.id}`}>{tune.name} <TuneFlags tune={tune} /></Link>
                     </td>
-                    <td><TuneFlags tune={tune} /></td>
-                    <td><Link to={`/tunes/filter/type/${tune.type}`}>{tune.type}</Link></td>
+                    <td><Link to={`/tunes/filter/type/${tune.type}`}>{pretty(tune.type)}</Link></td>
                     <td><Link to={`/tunes/filter/musicKey/${tune.musicKey}`}>{tune.musicKey}</Link></td>
-                    <td><Link to={`/tunes/filter/stage/${tune.stage}`}>{tune.stage}</Link></td>
-                    <td><Link to={`/tunes/filter/realm/${tune.realm}`}>{tune.realm}</Link></td>
+                    <td><Link to={`/tunes/filter/stage/${tune.stage}`}>{pretty(tune.stage)}</Link></td>
+                    <td><Link to={`/tunes/filter/realm/${tune.realm}`}>{pretty(tune.realm)}</Link></td>
+                    <td><Link to={`/tunes/filter/source/${tune.source}`}>{tune.source}</Link></td>
                 </tr>
             )}
         </tbody>

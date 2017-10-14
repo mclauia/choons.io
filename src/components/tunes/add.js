@@ -2,15 +2,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-    Row, Col,
+    Row, Col, Well,
     Button, FormGroup, FormControl, ControlLabel,
 } from 'react-bootstrap';
 import { push, goBack } from 'react-router-redux';
 import localStorage from 'local-storage';
 
 import { pushNewTune } from '../../firebase';
-// import './preload';
+
 import TuneNav from './nav'
+import { renderAbcTo } from './utils';
 
 class TuneAdd extends Component {
     constructor(props) {
@@ -33,6 +34,7 @@ class TuneAdd extends Component {
             videoValue: '',
             stageValue: '',
             notesValue: '',
+            hintValue: '',
         }
     }
 
@@ -47,19 +49,23 @@ class TuneAdd extends Component {
             session: this.state.sessionValue,
             video: this.state.videoValue,
             notes: this.state.notesValue,
-            stage: this.state.stageValue || 'learn',
+            stage: this.state.stageValue,
+            abc: this.state.hintValue,
             dateAdded: Date.now()
         });
         this.props.goBack();
     }
 
     render() {
+
+        renderAbcTo(this.state.hintValue, 'tuneHintPreview')
+
         return (
             <Row>
                 <Col xs={12} md={12}>
                     <h1>Add a Choon</h1>
                     <TuneNav back={true} />
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneName">
                         <ControlLabel>Name</ControlLabel>
                         {' '}
                         <FormControl
@@ -68,7 +74,7 @@ class TuneAdd extends Component {
                             onChange={(e) => this.setState({ tuneNameValue: e.target.value })}
                         />
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneAliases">
                         <ControlLabel>Aliases</ControlLabel>
                         {' '}
                         <FormControl
@@ -77,7 +83,7 @@ class TuneAdd extends Component {
                             onChange={(e) => this.setState({ aliasesValue: e.target.value })}
                         />
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneType">
                         <ControlLabel>Type</ControlLabel>
                         {' '}
                         <FormControl
@@ -100,7 +106,7 @@ class TuneAdd extends Component {
                             <option value="7dance">7 Dance</option>
                         </FormControl>
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneKey">
                         <ControlLabel>Key</ControlLabel>
                         {' '}
                         <FormControl
@@ -127,7 +133,7 @@ class TuneAdd extends Component {
                             <option value="Cm">Cm</option>
                         </FormControl>
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneRealm">
                         <ControlLabel>Realm</ControlLabel>
                         {' '}
                         <FormControl
@@ -147,35 +153,33 @@ class TuneAdd extends Component {
                             <option value="other">Other</option>
                         </FormControl>
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneSource">
                         <ControlLabel>Source</ControlLabel>
                         {' '}
                         <FormControl
                             value={this.state.sourceValue}
                             type="text"
                             name="source"
-                            autoComplete={true}
                             onChange={(e) => {
                                 this.setState({ sourceValue: e.target.value })
                                 localStorage.set(`CHOONS/newTune/source`, e.target.value)
                             }}
                         />
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneSession">
                         <ControlLabel>Session</ControlLabel>
                         {' '}
                         <FormControl
                             value={this.state.sessionValue}
                             type="text"
                             name="session"
-                            autoComplete={true}
                             onChange={(e) => {
                                 this.setState({ sessionValue: e.target.value })
                                 localStorage.set(`CHOONS/newTune/session`, e.target.value)
                             }}
                         />
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneVideo">
                         <ControlLabel>Video URL</ControlLabel>
                         {' '}
                         <FormControl
@@ -184,8 +188,8 @@ class TuneAdd extends Component {
                             onChange={(e) => this.setState({ videoValue: e.target.value })}
                         />
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
-                        <ControlLabel>Stage (if not new)</ControlLabel>
+                    <FormGroup controlId="tuneStage">
+                        <ControlLabel>Stage</ControlLabel>
                         {' '}
                         <FormControl
                             componentClass="select"
@@ -194,12 +198,12 @@ class TuneAdd extends Component {
                                 this.setState({ stageValue: e.target.value })
                             }}
                         >
-                            <option value="">-- Choose Stage --</option>
+                            <option value="learn">Learn</option>
                             <option value="enhance">Work on it</option>
                             <option value="drill">Drill it</option>
                         </FormControl>
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneNotes">
                         <ControlLabel>Notes</ControlLabel>
                         {' '}
                         <FormControl
@@ -207,6 +211,19 @@ class TuneAdd extends Component {
                             componentClass="textarea"
                             onChange={(e) => this.setState({ notesValue: e.target.value })}
                         />
+                    </FormGroup>
+                    <FormGroup controlId="tuneHint">
+                        <ControlLabel>Hint</ControlLabel>
+                        {' '}
+                        <FormControl
+                            value={this.state.hintValue}
+                            style={{ fontFamily: 'monospace', height: 120 }}
+                            componentClass="textarea"
+                            onChange={(e) => this.setState({ hintValue: e.target.value })}
+                        />
+                        {this.state.hintValue && <Well>
+                            <div id="tuneHintPreview"></div>
+                        </Well>}
                     </FormGroup>
                     <Button bsStyle="success" onClick={() => { this.persistTune() }}>Save Tune</Button>
                 </Col>

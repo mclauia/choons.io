@@ -1,4 +1,5 @@
 // react bindings
+/* global ABCJS */
 import React from 'react';
 import {
     Table
@@ -14,11 +15,14 @@ import {
     wasAddedRecently,
     wasLearntRecently,
     wasForgotten,
-    isPracticedALot
+    isPracticedALot,
+    pretty,
+    renderAbcTo
 } from './utils';
 
 export default function TuneView({ tune }) {
-    console.log(tune)
+    renderAbcTo(tune.abc, 'tuneHint')
+
     return (<div>
         <h1>{tune.name} <TuneFlags tune={tune} /></h1>
         <TuneNav back={true} edit={tune.id} />
@@ -31,7 +35,7 @@ export default function TuneView({ tune }) {
                 </tr>}
                 <tr>
                     <td><strong>Type</strong></td>
-                    <td>{tune.type}</td>
+                    <td>{pretty(tune.type)}</td>
                 </tr>
                 <tr>
                     <td><strong>Key</strong></td>
@@ -39,8 +43,12 @@ export default function TuneView({ tune }) {
                 </tr>
                 <tr>
                     <td><strong>Stage</strong></td>
-                    <td>{tune.stage}</td>
+                    <td>{pretty(tune.stage)}</td>
                 </tr>
+                {!!tune.realm && <tr>
+                    <td><strong>Realm</strong></td>
+                    <td>{pretty(tune.realm)}</td>
+                </tr>}
                 {!!tune.era && <tr>
                     <td><strong>Era</strong></td>
                     <td>{tune.era}</td>
@@ -56,8 +64,8 @@ export default function TuneView({ tune }) {
                 <tr>
                     <td><strong>Videos</strong></td>
                     <td>
-                        {tune.video && <a href={tune.video}>{tune.video.includes('youtube') ? 'YouTube' : 'Video'}</a>}
-                        {tune.video2 && <a href={tune.video2}>{tune.video2.includes('youtube') ? 'YouTube' : 'Video'}</a>}
+                        {tune.video && <a href={tune.video} target="_blank" rel="noopener noreferrer">{tune.video.includes('youtube') ? 'YouTube' : 'Video'}</a>}
+                        {tune.video2 && <a href={tune.video2} target="_blank" rel="noopener noreferrer">{tune.video2.includes('youtube') ? 'YouTube' : 'Video'}</a>}
                     </td>
                 </tr>
                 <tr>
@@ -66,7 +74,7 @@ export default function TuneView({ tune }) {
                 </tr>
                 {!!tune.dots && <tr>
                     <td><strong>Dots</strong></td>
-                    <td>{tune.dots && <a href={tune.dots}>The dots</a>}</td>
+                    <td>{tune.dots && <a href={tune.dots} target="_blank" rel="noopener noreferrer">The dots</a>}</td>
                 </tr>}
                 {!!tune.session && <tr>
                     <td><strong>Sessions</strong></td>
@@ -75,6 +83,10 @@ export default function TuneView({ tune }) {
                 {!!tune.notes && <tr>
                     <td><strong>Notes</strong></td>
                     <td>{tune.notes}</td>
+                </tr>}
+                {!!tune.abc && <tr>
+                    <td><strong>Hint</strong></td>
+                    <td><div id="tuneHint"></div></td>
                 </tr>}
             </tbody>
         </Table>

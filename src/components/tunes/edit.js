@@ -2,14 +2,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-    Row, Col,
+    Row, Col, Well,
     Button, FormGroup, FormControl, ControlLabel,
 } from 'react-bootstrap';
 import { push, goBack } from 'react-router-redux';
 
 import { updateTune } from '../../firebase';
-// import './preload';
+
 import TuneNav from './nav'
+import { renderAbcTo } from './utils';
 
 class TuneEdit extends Component {
     constructor(props) {
@@ -31,6 +32,7 @@ class TuneEdit extends Component {
             videoValue: tune.video || '',
             video2Value: tune.video2 || '',
             dotsValue: tune.dots || '',
+            hintValue: tune.abc || '',
         }
     }
 
@@ -50,18 +52,22 @@ class TuneEdit extends Component {
             video: this.state.videoValue,
             video2: this.state.video2Value,
             dots: this.state.dotsValue,
+            abc: this.state.hintValue,
         });
         this.props.goBack()
     }
 
     render() {
         const { tune } = this.props;
+
+        renderAbcTo(this.state.hintValue, 'tuneHintPreview')
+
         return (
             <Row>
                 <Col xs={12} md={12}>
                     <h1>Edit {tune.name}</h1>
                     <TuneNav back={true} view={tune.id} />
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneName">
                         <ControlLabel>Name</ControlLabel>
                         {' '}
                         <FormControl
@@ -70,7 +76,7 @@ class TuneEdit extends Component {
                             onChange={(e) => this.setState({ tuneNameValue: e.target.value })}
                         />
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneAliases">
                         <ControlLabel>Aliases</ControlLabel>
                         {' '}
                         <FormControl
@@ -79,7 +85,7 @@ class TuneEdit extends Component {
                             onChange={(e) => this.setState({ aliasesValue: e.target.value })}
                         />
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneType">
                         <ControlLabel>Type</ControlLabel>
                         {' '}
                         <FormControl
@@ -101,7 +107,7 @@ class TuneEdit extends Component {
                             <option value="7dance">7 Dance</option>
                         </FormControl>
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneKey">
                         <ControlLabel>Key</ControlLabel>
                         {' '}
                         <FormControl
@@ -128,7 +134,7 @@ class TuneEdit extends Component {
                             <option value="Cm">Cm</option>
                         </FormControl>
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneRealm">
                         <ControlLabel>Realm</ControlLabel>
                         {' '}
                         <FormControl
@@ -147,7 +153,7 @@ class TuneEdit extends Component {
                             <option value="other">Other</option>
                         </FormControl>
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneSource">
                         <ControlLabel>Source</ControlLabel>
                         {' '}
                         <FormControl
@@ -160,7 +166,7 @@ class TuneEdit extends Component {
                             }}
                         />
                     </FormGroup>
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneSession">
                         <ControlLabel>Session</ControlLabel>
                         {' '}
                         <FormControl
@@ -174,7 +180,7 @@ class TuneEdit extends Component {
                         />
                     </FormGroup>
 
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneEra">
                         <ControlLabel>Era</ControlLabel>
                         {' '}
                         <FormControl
@@ -184,7 +190,7 @@ class TuneEdit extends Component {
                         />
                     </FormGroup>
 
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneComposer">
                         <ControlLabel>Composer</ControlLabel>
                         {' '}
                         <FormControl
@@ -194,7 +200,7 @@ class TuneEdit extends Component {
                         />
                     </FormGroup>
 
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneVideo">
                         <ControlLabel>Video URL</ControlLabel>
                         {' '}
                         <FormControl
@@ -204,7 +210,7 @@ class TuneEdit extends Component {
                         />
                     </FormGroup>
 
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneVideo2">
                         <ControlLabel>Video URL 2</ControlLabel>
                         {' '}
                         <FormControl
@@ -214,7 +220,7 @@ class TuneEdit extends Component {
                         />
                     </FormGroup>
 
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneDots">
                         <ControlLabel>Dots</ControlLabel>
                         {' '}
                         <FormControl
@@ -224,7 +230,7 @@ class TuneEdit extends Component {
                         />
                     </FormGroup>
 
-                    <FormGroup controlId="chapterShortDesc">
+                    <FormGroup controlId="tuneNotes">
                         <ControlLabel>Notes</ControlLabel>
                         {' '}
                         <FormControl
@@ -232,6 +238,19 @@ class TuneEdit extends Component {
                             componentClass="textarea"
                             onChange={(e) => this.setState({ notesValue: e.target.value })}
                         />
+                    </FormGroup>
+                    <FormGroup controlId="tuneHint">
+                        <ControlLabel>Hint</ControlLabel>
+                        {' '}
+                        <FormControl
+                            style={{ fontFamily: 'monospace', height: 120 }}
+                            value={this.state.hintValue}
+                            componentClass="textarea"
+                            onChange={(e) => this.setState({ hintValue: e.target.value })}
+                        />
+                        {this.state.hintValue && <Well>
+                            <div id="tuneHintPreview"></div>
+                        </Well>}
                     </FormGroup>
                     <Button bsStyle="success" onClick={() => { this.persistTune() }}>Save Changes</Button>
                 </Col>

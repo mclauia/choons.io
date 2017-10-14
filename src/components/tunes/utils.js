@@ -1,3 +1,5 @@
+/* global ABCJS */
+
 // practiced in the last week
 export function wasPracticedRecently(tune) {
     return (Date.now() - tune.lastPracticedTimestamp) / 1000 / 60 / 60 / 24 < 7;
@@ -29,14 +31,19 @@ export function isPracticedALot(tune) {
 }
 
 export const sort = (tunes) => ({
-    by: (...keys) => {
-        return keys.reduce((prev, key) => {
-            return prev.sort((a, b) => {
+    by: (key, dir) => {
+        return tunes.sort((a, b) => {
+            if (dir === 'desc') {
                 if ((!a[key] && !b[key]) || a[key] === b[key]) return 0;
-                if (!b[key] || a[key] < b[key]) return -1;
-                if (!a[key] || a[key] > b[key]) return 1;
-            })
-        }, tunes)
+                if (!b[key] || a[key] > b[key]) return -1;
+                if (!a[key] || a[key] < b[key]) return 1;
+                return 0
+            }
+            if ((!a[key] && !b[key]) || a[key] === b[key]) return 0;
+            if (!b[key] || a[key] < b[key]) return -1;
+            if (!a[key] || a[key] > b[key]) return 1;
+            return 0;
+        })
     }
 })
 
@@ -79,3 +86,36 @@ export const filter = (tunes) => ({
         }, tunes)
     }
 })
+
+export function renderAbcTo(abc, targetId) {
+    if (abc) {
+        // i have no idea how to interop this with react, sooo
+        setTimeout(() => {
+            console.log(ABCJS.renderAbc(targetId, abc, {}, { scale: 0.7 }))
+        }, 1000)
+    };
+}
+
+export function pretty(key) {
+    return pretty.texts[key] || '';
+}
+
+pretty.texts = {
+    quebecois: 'Québécois',
+    scottish: 'Scottish',
+    irish: 'Irish',
+
+    reel: 'Reel',
+    jig: 'Jig',
+    waltz: 'Waltz',
+    air: 'Air',
+    hornpipe: 'Hornpipe',
+    slipjig: 'Slip Jig',
+    march: 'March',
+
+    learn: 'Learn it',
+    drill: 'Drill it',
+    enhance: 'Work on it',
+    perform: 'Perform it',
+    embellish: 'Embellish it'
+}

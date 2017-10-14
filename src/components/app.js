@@ -24,14 +24,14 @@ export default withRouter(({ history }) => {
                 </Navbar.Header>
             </Navbar>
             <Grid>
-                <Row className="pad-bottom">
+                {/* <Row className="pad-bottom">
                     <Col xs={12} md={12}>
                         <Tabs id="ok" activeKey={currentTab} onSelect={(route) => history.push(`/${route}`)}>
                             <Tab eventKey={'tunes'} title="Tunes" />
-                            {/* <Tab eventKey={'practice'} title="Practice" /> */}
+                            <Tab eventKey={'practice'} title="Practice" />
                         </Tabs>
                     </Col>
-                </Row>
+                </Row> */}
                 <Row>
                     <Col xs={12} md={12}>
                         <Switch>
