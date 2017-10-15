@@ -5,9 +5,9 @@ export function wasPracticedRecently(tune) {
     return (Date.now() - tune.lastPracticedTimestamp) / 1000 / 60 / 60 / 24 < 7;
 }
 
-// has not been practiced in the last month
+// has not been practiced in the last week
 export function hasCobwebs(tune) {
-    return (Date.now() - tune.lastPracticedTimestamp) / 1000 / 60 / 60 / 24 > 31;
+    return (Date.now() - tune.lastPracticedTimestamp) / 1000 / 60 / 60 / 24 > 7;
 }
 
 // practiced in the last month
@@ -15,7 +15,7 @@ export function wasAddedRecently(tune) {
     return (Date.now() - tune.dateAdded) / 1000 / 60 / 60 / 24 < 31;
 }
 
-// was added a long time ago and never learned
+// was added a while ago and never learned
 export function wasForgotten(tune) {
     return !tune.dateLearnt && (Date.now() - tune.dateAdded) / 1000 / 60 / 60 / 24 > 31;
 }
@@ -92,26 +92,70 @@ export function renderAbcTo(abc, targetId) {
         // i have no idea how to interop this with react, sooo
         setTimeout(() => {
             console.log(ABCJS.renderAbc(targetId, abc, {}, { scale: 0.7 }))
-        }, 1000)
+        }, 300)
     };
 }
 
+export function getDefaultHintFor(type) {
+    return getDefaultHintFor.hints[type] || '';
+}
+
+getDefaultHintFor.hints = {
+    reel: `M: 4/4
+K: D
+| | |`,
+    hornpipe: `M: 4/4
+K: D
+| | |`,
+    jig: `M: 6/8
+K: D
+| | |`,
+    slide: `M: 12/8
+K: D
+| | |`,
+    slipjig: `M: 9/8
+K: D
+| | |`,
+    waltz: `M: 3/4
+K: D
+| | |`,
+    march: `M: 4/4
+K: D
+| | |`,
+    air: `M: 4/4
+K: D
+| | |`,
+    barndance: `M: 4/4
+K: D
+| | |`,
+    '7dance': `M: 7/4
+K: D
+| | |`,
+}
+
 export function pretty(key) {
-    return pretty.texts[key] || '';
+    return pretty.texts[key] || key;
 }
 
 pretty.texts = {
+    reel: 'Reel',
+    hornpipe: 'Hornpipe',
+    jig: 'Jig',
+    slide: 'Slide',
+    slipjig: 'Slipjig',
+    waltz: 'Waltz',
+    march: 'March',
+    air: 'Air',
+    barndance: 'Barndance',
+    '7dance': '7 Dance',
+
+    irish: 'Irish',
     quebecois: 'Québécois',
     scottish: 'Scottish',
-    irish: 'Irish',
-
-    reel: 'Reel',
-    jig: 'Jig',
-    waltz: 'Waltz',
-    air: 'Air',
-    hornpipe: 'Hornpipe',
-    slipjig: 'Slip Jig',
-    march: 'March',
+    arabic: 'Arabic',
+    oldtime: 'Oldtime',
+    scandi: 'Scandinavian',
+    other: 'Other',
 
     learn: 'Learn it',
     drill: 'Drill it',

@@ -10,7 +10,8 @@ import { push, goBack } from 'react-router-redux';
 import { updateTune } from '../../firebase';
 
 import TuneNav from './nav'
-import { renderAbcTo } from './utils';
+import { getDefaultHintFor } from './utils';
+import { TuneTypeSelect, TuneKeySelect, TuneRealmSelect, TuneHintEditor } from './form';
 
 class TuneEdit extends Component {
     constructor(props) {
@@ -57,10 +58,14 @@ class TuneEdit extends Component {
         this.props.goBack()
     }
 
+    maybePrefillHint = () => {
+        const { hintValue, typeValue } = this.state;
+        const nextHint = hintValue ? hintValue : getDefaultHintFor(typeValue);
+        this.setState({ hintValue: nextHint });
+    }
+
     render() {
         const { tune } = this.props;
-
-        renderAbcTo(this.state.hintValue, 'tuneHintPreview')
 
         return (
             <Row>
@@ -88,70 +93,29 @@ class TuneEdit extends Component {
                     <FormGroup controlId="tuneType">
                         <ControlLabel>Type</ControlLabel>
                         {' '}
-                        <FormControl
-                            componentClass="select"
-                            value={this.state.typeValue}
+                        <TuneTypeSelect value={this.state.typeValue}
                             onChange={(e) => {
                                 this.setState({ typeValue: e.target.value })
                             }}
-                        >
-                            <option value="">-- Choose Type --</option>
-                            <option value="reel">Reel</option>
-                            <option value="hornpipe">Hornpipe</option>
-                            <option value="jig">Jig</option>
-                            <option value="slide">Slide</option>
-                            <option value="slipjig">Slipjig</option>
-                            <option value="waltz">Waltz</option>
-                            <option value="air">Air</option>
-                            <option value="barndance">Barndance</option>
-                            <option value="7dance">7 Dance</option>
-                        </FormControl>
+                        />
                     </FormGroup>
                     <FormGroup controlId="tuneKey">
                         <ControlLabel>Key</ControlLabel>
                         {' '}
-                        <FormControl
-                            componentClass="select"
-                            value={this.state.musicKeyValue}
+                        <TuneKeySelect value={this.state.musicKeyValue}
                             onChange={(e) => {
                                 this.setState({ musicKeyValue: e.target.value })
                             }}
-                        >
-                            <option value="">-- Choose Key --</option>
-                            <option value="D">D</option>
-                            <option value="Dm">Dm</option>
-                            <option value="E">E</option>
-                            <option value="Em">Em</option>
-                            <option value="F">F</option>
-                            <option value="Fm">Fm</option>
-                            <option value="G">G</option>
-                            <option value="Gm">Gm</option>
-                            <option value="A">A</option>
-                            <option value="Am">Am</option>
-                            <option value="B">B</option>
-                            <option value="Bm">Bm</option>
-                            <option value="C">C</option>
-                            <option value="Cm">Cm</option>
-                        </FormControl>
+                        />
                     </FormGroup>
                     <FormGroup controlId="tuneRealm">
                         <ControlLabel>Realm</ControlLabel>
                         {' '}
-                        <FormControl
-                            componentClass="select"
-                            value={this.state.realmValue}
+                        <TuneRealmSelect value={this.state.realmValue}
                             onChange={(e) => {
                                 this.setState({ realmValue: e.target.value })
                             }}
-                        >
-                            <option value="">-- Choose Realm --</option>
-                            <option value="irish">Irish</option>
-                            <option value="quebecois">Québécois</option>
-                            <option value="scottish">Scottish</option>
-                            <option value="arabic">Arabic</option>
-                            <option value="oldtime">Oldtime</option>
-                            <option value="other">Other</option>
-                        </FormControl>
+                        />
                     </FormGroup>
                     <FormGroup controlId="tuneSource">
                         <ControlLabel>Source</ControlLabel>
@@ -242,15 +206,10 @@ class TuneEdit extends Component {
                     <FormGroup controlId="tuneHint">
                         <ControlLabel>Hint</ControlLabel>
                         {' '}
-                        <FormControl
-                            style={{ fontFamily: 'monospace', height: 120 }}
-                            value={this.state.hintValue}
-                            componentClass="textarea"
+                        <TuneHintEditor value={this.state.hintValue}
                             onChange={(e) => this.setState({ hintValue: e.target.value })}
+                            onFocus={this.maybePrefillHint}
                         />
-                        {this.state.hintValue && <Well>
-                            <div id="tuneHintPreview"></div>
-                        </Well>}
                     </FormGroup>
                     <Button bsStyle="success" onClick={() => { this.persistTune() }}>Save Changes</Button>
                 </Col>

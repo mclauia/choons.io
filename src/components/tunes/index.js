@@ -34,7 +34,8 @@ class Tunes extends Component {
         this.props.pushRoute(`/tunes/filter/realm/${selection}`)
     }
 
-    goPractice = () => this.props.pushRoute(`/tunes/sort/lastPracticedTimestamp/desc`);
+    seePractice = () => this.props.pushRoute(`/tunes/sort/lastPracticedTimestamp/desc`)
+    seeHistory = () => this.props.pushRoute(`/tunes/sort/dateLearnt/desc`)
 
     render() {
         const { tunes, filterKey, filterValue } = this.props;
@@ -48,9 +49,18 @@ class Tunes extends Component {
                                 <h1>All Choons</h1>
                                 <TuneNav add={true} />
                                 <Row className="pad-butt"><Col xs={12} md={12}>
-                                    <div className="pull-left" style={{ marginRight: 10 }}><FilterFlags flags={''} onSelect={this.setFlags} /></div>
-                                    <div className="pull-left"><FilterRealms onSelect={this.setRealms} /></div>
-                                    <div className="pull-left"><Button onClick={this.goPractice} style={{ marginLeft: 10 }}>Practice</Button></div>
+                                    <div className="pull-left">
+                                        <FilterFlags flags={''} onSelect={this.setFlags} />
+                                    </div>
+                                    <div className="pull-left" style={{ marginLeft: 10 }}>
+                                        <FilterRealms onSelect={this.setRealms} />
+                                    </div>
+                                    <div className="pull-left" style={{ marginLeft: 10 }}>
+                                        <Button onClick={this.seePractice}>Practice</Button>
+                                    </div>
+                                    <div className="pull-left" style={{ marginLeft: 10 }}>
+                                        <Button onClick={this.seeHistory}>History</Button>
+                                    </div>
                                 </Col></Row>
 
                                 <Typeahead

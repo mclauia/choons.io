@@ -2,7 +2,7 @@
 /* global ABCJS */
 import React from 'react';
 import {
-    Table
+    Table, OverlayTrigger, Tooltip
 } from 'react-bootstrap';
 import format from 'date-fns/format';
 
@@ -95,11 +95,35 @@ export default function TuneView({ tune }) {
 
 export function TuneFlags({ tune }) {
     return <span>
-        {wasPracticedRecently(tune) && '🎻 '}
-        {hasCobwebs(tune) && '🕸 '}
-        {wasAddedRecently(tune) && '🌕 '}
-        {wasLearntRecently(tune) && '🔰 '}
-        {wasForgotten(tune) && '🌑 '}
-        {isPracticedALot(tune) && '⭐ '}
+        {wasPracticedRecently(tune) &&
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasPracticedRecentlyTip">recently practiced</Tooltip>}>
+                <span>🎻 </span>
+            </OverlayTrigger>
+        }
+        {hasCobwebs(tune) &&
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="hasCobwebsTip">not recently practiced</Tooltip>}>
+                <span>🕸 </span>
+            </OverlayTrigger>
+        }
+        {wasAddedRecently(tune) &&
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasAddedRecentlyTip">added recently</Tooltip>}>
+                <span>🌕 </span>
+            </OverlayTrigger>
+        }
+        {wasLearntRecently(tune) &&
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasLearntRecentlyTip">learnt recently</Tooltip>}>
+                <span>🔰 </span>
+            </OverlayTrigger>
+        }
+        {wasForgotten(tune) &&
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasForgottenTip">added, then forgotten</Tooltip>}>
+                <span>🌑 </span>
+            </OverlayTrigger>
+        }
+        {isPracticedALot(tune) &&
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="isPracticedALotTip">quite a fave</Tooltip>}>
+                <span>⭐ </span>
+            </OverlayTrigger>
+        }
     </span>
 }
