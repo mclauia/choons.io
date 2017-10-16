@@ -96,41 +96,30 @@ export function renderAbcTo(abc, targetId) {
     };
 }
 
-export function getDefaultHintFor(type) {
-    return getDefaultHintFor.hints[type] || '';
-}
-
-getDefaultHintFor.hints = {
-    reel: `M: 4/4
-K: D
-| | |`,
-    hornpipe: `M: 4/4
-K: D
-| | |`,
-    jig: `M: 6/8
-K: D
-| | |`,
-    slide: `M: 12/8
-K: D
-| | |`,
-    slipjig: `M: 9/8
-K: D
-| | |`,
-    waltz: `M: 3/4
-K: D
-| | |`,
-    march: `M: 4/4
-K: D
-| | |`,
-    air: `M: 4/4
-K: D
-| | |`,
-    barndance: `M: 4/4
-K: D
-| | |`,
-    '7dance': `M: 7/4
-K: D
-| | |`,
+export function getDefaultHintFor(type, musicKey) {
+    var timeSig;
+    switch(type) {
+        case 'jig':
+            timeSig = '6/8';
+            break;
+        case 'slide':
+            timeSig = '12/8';
+            break;
+        case 'slipjig':
+            timeSig = '9/8';
+            break;
+        case 'waltz':
+            timeSig = '3/4';
+            break;
+        case '7dance':
+            timeSig = '7/4';
+            break;
+        default:
+            timeSig = '4/4';
+    }
+    return `M: ${timeSig}
+K: ${musicKey}
+| | |`
 }
 
 export function pretty(key) {

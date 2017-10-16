@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-    Row, Col, Well,
+    Row, Col,
     Button, FormGroup, FormControl, ControlLabel,
 } from 'react-bootstrap';
 import { push, goBack } from 'react-router-redux';
@@ -58,8 +58,8 @@ class TuneAdd extends Component {
     }
 
     maybePrefillHint = () => {
-        const { hintValue, typeValue } = this.state;
-        const nextHint = hintValue ? hintValue : getDefaultHintFor(typeValue);
+        const { hintValue, typeValue, musicKeyValue } = this.state;
+        const nextHint = hintValue ? hintValue : getDefaultHintFor(typeValue, musicKeyValue);
         this.setState({ hintValue: nextHint });
     }
 

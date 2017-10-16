@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Route, Link } from 'react-router-dom';
+import localStorage from 'local-storage';
 import {
     Button,
     Row, Col, Table,
@@ -14,7 +15,7 @@ import { push } from 'react-router-redux';
 import TuneView, { TuneFlags } from './view'
 import TuneEdit from './edit'
 import TuneNav from './nav'
-
+import FilterWidget from './filter';
 import { filter, sort, pretty } from './utils';
 
 class Tunes extends Component {
@@ -35,10 +36,21 @@ class Tunes extends Component {
     }
 
     seePractice = () => this.props.pushRoute(`/tunes/sort/lastPracticedTimestamp/desc`)
-    seeHistory = () => this.props.pushRoute(`/tunes/sort/dateLearnt/desc`)
+    seeHistory = () => this.props.pushRoute(`/tunes/sort/dateLearnt/desc`);
+
+    filterDown = (filterBy, filterTo) => {
+        this.props.pushRoute(`/tunes/filter/${filterBy}/${filterTo}`)
+        const oldFilterCrumbs = localStorage.get('CHOONS/filterCrumbs') || [];
+        oldFilterCrumbs.unshift({title: pretty(filterTo), path: `/tunes/filter/${filterBy}/${filterTo}`});
+
+        const newFilterCrumbs = oldFilterCrumbs.slice(0, 3);
+        localStorage.set('CHOONS/filterCrumbs', newFilterCrumbs);
+    }
 
     render() {
         const { tunes, filterKey, filterValue } = this.props;
+
+        const filterCrumbs = localStorage.get('CHOONS/filterCrumbs') || [];
 
         return (
             <Row>
@@ -48,19 +60,27 @@ class Tunes extends Component {
                             <Row><Col xs={12} md={12}>
                                 <h1>All Choons</h1>
                                 <TuneNav add={true} />
-                                <Row className="pad-butt"><Col xs={12} md={12}>
+                                <Row className="pad-butt"><Col xs={12} md={4}>
+                                    <FilterWidget onFilterSelect={this.filterDown} />
+                                </Col><Col xs={12} md={8}>
                                     <div className="pull-left">
                                         <FilterFlags flags={''} onSelect={this.setFlags} />
                                     </div>
-                                    <div className="pull-left" style={{ marginLeft: 10 }}>
+                                    {/*<div className="pull-left" style={{ marginLeft: 10 }}>
                                         <FilterRealms onSelect={this.setRealms} />
-                                    </div>
+                                    </div>*/}
                                     <div className="pull-left" style={{ marginLeft: 10 }}>
                                         <Button onClick={this.seePractice}>Practice</Button>
                                     </div>
                                     <div className="pull-left" style={{ marginLeft: 10 }}>
                                         <Button onClick={this.seeHistory}>History</Button>
                                     </div>
+                                </Col></Row>
+
+                                <Row className="pad-butt"><Col xs={12} md={8}>
+                                    Recent: {filterCrumbs.map((crumb, i) => (
+                                        <span key={i}>{i > 0 ? ' | ' : ''} <Link to={crumb.path}>{crumb.title}</Link></span>
+                                    ))}
                                 </Col></Row>
 
                                 <Typeahead
@@ -123,19 +143,6 @@ function FilterFlags({ flags, onSelect }) {
             <ToggleButton value={'🕸'}><span role="img" aria-label="Hasn't been practiced recently">🕸</span></ToggleButton>
             <ToggleButton value={'🌑'}><span role="img" aria-label="Never got learned">🌑</span></ToggleButton>
             <ToggleButton value={'⭐'}><span role="img" aria-label="Practiced a lot">⭐</span></ToggleButton>
-        </ToggleButtonGroup>
-    </ButtonToolbar>
-}
-
-function FilterRealms({ onSelect }) {
-    return <ButtonToolbar>
-        <ToggleButtonGroup type="radio"
-            name="realmFilter"
-            value={null}
-            onChange={onSelect}>
-            <ToggleButton value={'quebecois'}>Quebecois</ToggleButton>
-            <ToggleButton value={'irish'}>Irish</ToggleButton>
-            <ToggleButton value={'scottish'}>Scottish</ToggleButton>
         </ToggleButtonGroup>
     </ButtonToolbar>
 }

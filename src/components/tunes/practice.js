@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-    Button, Alert, FormGroup, InputGroup, Row, Col, Form, FormControl
+    Button, Alert, InputGroup, Row, Col, Form, FormControl
 } from 'react-bootstrap';
 import format from 'date-fns/format';
 import { updateTune } from '../../firebase';

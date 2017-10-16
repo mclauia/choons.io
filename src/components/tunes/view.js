@@ -1,5 +1,4 @@
 // react bindings
-/* global ABCJS */
 import React from 'react';
 import {
     Table, OverlayTrigger, Tooltip
@@ -97,32 +96,32 @@ export function TuneFlags({ tune }) {
     return <span>
         {wasPracticedRecently(tune) &&
             <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasPracticedRecentlyTip">recently practiced</Tooltip>}>
-                <span>🎻 </span>
+                <span role="img" aria-label="Practiced recently">🎻 </span>
             </OverlayTrigger>
         }
         {hasCobwebs(tune) &&
             <OverlayTrigger placement="bottom" overlay={<Tooltip id="hasCobwebsTip">not recently practiced</Tooltip>}>
-                <span>🕸 </span>
+                <span role="img" aria-label="Hasn't been practiced recently">🕸 </span>
             </OverlayTrigger>
         }
         {wasAddedRecently(tune) &&
             <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasAddedRecentlyTip">added recently</Tooltip>}>
-                <span>🌕 </span>
+                <span role="img" aria-label="Added recently">🌕 </span>
             </OverlayTrigger>
         }
         {wasLearntRecently(tune) &&
             <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasLearntRecentlyTip">learnt recently</Tooltip>}>
-                <span>🔰 </span>
+                <span role="img" aria-label="Learned recently">🔰 </span>
             </OverlayTrigger>
         }
         {wasForgotten(tune) &&
             <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasForgottenTip">added, then forgotten</Tooltip>}>
-                <span>🌑 </span>
+                <span role="img" aria-label="Never got learned">🌑 </span>
             </OverlayTrigger>
         }
         {isPracticedALot(tune) &&
             <OverlayTrigger placement="bottom" overlay={<Tooltip id="isPracticedALotTip">quite a fave</Tooltip>}>
-                <span>⭐ </span>
+                <span role="img" aria-label="Practiced a lot">⭐ </span>
             </OverlayTrigger>
         }
     </span>
