@@ -1,4 +1,9 @@
 /* global ABCJS */
+import format from 'date-fns/format';
+
+export function formatTimestamp(timestamp, hour = true) {
+    return format(timestamp, `MMMM Do YYYY${hour ? ', h:mm A' : ''}`);
+}
 
 // practiced in the last week
 export function wasPracticedRecently(tune) {
@@ -127,6 +132,9 @@ export function pretty(key) {
 }
 
 pretty.texts = {
+    lastPracticedTimestamp: 'Last Practiced',
+    dateLearnt: 'Date Learnt',
+
     reel: 'Reel',
     hornpipe: 'Hornpipe',
     jig: 'Jig',

@@ -16,7 +16,7 @@ import TuneView, { TuneFlags } from './view'
 import TuneEdit from './edit'
 import TuneNav from './nav'
 import FilterWidget from './filter';
-import { filter, sort, pretty } from './utils';
+import { filter, sort, pretty, formatTimestamp } from './utils';
 
 class Tunes extends Component {
     state = {
@@ -97,7 +97,7 @@ class Tunes extends Component {
                             </Col></Row>
                         )
                     }}/>
-                    <Route path="/tunes/byFlag/:flags" render={({match:{params: {flags}}}) => (
+                    <Route path="/tunes/byFlag/:flags" render={({ match:{ params: { flags } } }) => (
                         <div>
                             <h1>Some Choons</h1>
                             <TuneNav add={true} back={true} />
@@ -106,18 +106,18 @@ class Tunes extends Component {
                             <TunesTable tunes={sort(filter(tunes).byFlags(flags)).by('name')}/>
                         </div>
                     )}/>
-                    <Route path="/tunes/filter/:filterKey?/:filterValue?" render={(props) => (
+                    <Route path="/tunes/filter/:filterKey?/:filterValue?" render={({ match:{ params: { filterKey, filterValue } } }) => (
                         <div>
                             <h1>Some Choons</h1>
                             <TuneNav add={true} back={true} />
-                            <TunesTable tunes={sort(filter(tunes).byKey(filterKey, filterValue)).by('name')}/>
+                            <TunesTable tunes={sort(filter(tunes).byKey(filterKey, filterValue)).by('name')} filterKey={filterKey} filterValue={filterValue}/>
                         </div>
                     )}/>
                     <Route path="/tunes/sort/:sortKey?/:sortDir?" render={({match:{params: {sortKey, sortDir}}}) => (
                         <div>
                             <h1>Some Choons</h1>
                             <TuneNav add={true} back={true} />
-                            <TunesTable tunes={sort(tunes.filter((tune) => tune[sortKey])).by(sortKey, sortDir)}/>
+                            <TunesTable tunes={sort(tunes.filter((tune) => tune[sortKey])).by(sortKey, sortDir)} sortKey={sortKey} />
                         </div>
                     )}/>
                     <Route path="/tunes/view/:tuneId" render={({match:{params: {tuneId}}}) => (
@@ -147,7 +147,13 @@ function FilterFlags({ flags, onSelect }) {
     </ButtonToolbar>
 }
 
-function TunesTable({ tunes }) {
+const timestampKeys = [
+    'lastPracticedTimestamp',
+    'dateLearnt'
+];
+
+function TunesTable({ tunes, filterKey, filterValue, sortKey }) {
+    const timestampColumn = timestampKeys.includes(sortKey) ? sortKey : null;
     return <Table striped bordered hover responsive>
         <thead>
             <tr>
@@ -158,6 +164,7 @@ function TunesTable({ tunes }) {
                 <th>Stage</th>
                 <th>Realm</th>
                 <th>Source</th>
+                {timestampColumn && <th>{pretty(sortKey)}</th>}
             </tr>
         </thead>
         <tbody>
@@ -173,6 +180,7 @@ function TunesTable({ tunes }) {
                     <td><Link to={`/tunes/filter/stage/${tune.stage}`}>{pretty(tune.stage)}</Link></td>
                     <td><Link to={`/tunes/filter/realm/${tune.realm}`}>{pretty(tune.realm)}</Link></td>
                     <td><Link to={`/tunes/filter/source/${tune.source}`}>{tune.source}</Link></td>
+                    {timestampColumn && <td>{formatTimestamp(tune[sortKey], false)}</td>}
                 </tr>
             )}
         </tbody>

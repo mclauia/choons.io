@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import {
     Button, Alert, InputGroup, Row, Col, Form, FormControl
 } from 'react-bootstrap';
-import format from 'date-fns/format';
 import { updateTune } from '../../firebase';
+import { formatTimestamp } from './utils';
 
 class TunePractice extends Component {
     state = {
@@ -56,7 +56,7 @@ class TunePractice extends Component {
         const { lastPracticedTimestamp, secondsPracticed, dateLearnt } = this.props.tune;
 
         return <Alert className="pad-butt">
-            {lastPracticedTimestamp && <p>You last practiced this on {format(lastPracticedTimestamp, 'MMMM Do YYYY, h:mm A')}
+            {lastPracticedTimestamp && <p>You last practiced this on {formatTimestamp(lastPracticedTimestamp)}
                 {secondsPracticed && `, for a total of ${(secondsPracticed / 60).toFixed(2)} minutes`}
             </p>}
 
