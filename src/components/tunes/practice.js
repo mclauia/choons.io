@@ -13,6 +13,28 @@ class TunePractice extends Component {
         practiceEnd: null,
         practiceValue: ''
     }
+    constructor(props) {
+        super(props);
+
+        window.addEventListener('keydown', this.onSpacebar);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('keydown', this.onSpacebar);
+    }
+
+    onSpacebar = (e) => {
+        if (e.keyCode === 32) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (this.state.isPracticing) {
+                this.endPractice();
+            } else {
+                this.startPractice();
+            }
+        }
+    }
 
     startPractice = () => {
         this.setState({ isPracticing: true, practiceStart: Date.now(), practiceEnd: null })
