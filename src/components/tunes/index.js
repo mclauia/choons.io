@@ -18,48 +18,60 @@ import TuneNav from './nav'
 import FilterWidget from './filter';
 import { filter, sort, pretty, formatTimestamp } from './utils';
 
+import { fetchReadList } from './read';
+
 class Tunes extends Component {
     state = {
         filterSortSelections: [],
         typeaheadSelections: []
     }
 
+    componentDidMount() {
+        if (this.props.userId !== 'my') {
+            this.props.fetchReadList(this.props.userId);
+        }
+    }
+
     setFlags = (nextSelections) => {
         if (nextSelections.length) {
-            this.props.pushRoute(`/tunes/byFlag/${nextSelections.join('')}`)
+            this.props.pushRoute(`/${this.props.userId}/tunes/byFlag/${nextSelections.join('')}`)
         } else {
-            this.props.pushRoute(`/tunes`)
+            this.props.pushRoute(`/${this.props.userId}/tunes`)
         }
     }
     setRealms = (selection) => {
-        this.props.pushRoute(`/tunes/filter/realm/${selection}`)
+        this.props.pushRoute(`/${this.props.userId}/tunes/filter/realm/${selection}`)
     }
 
-    seePractice = () => this.props.pushRoute(`/tunes/sort/lastPracticedTimestamp/desc`)
-    seeHistory = () => this.props.pushRoute(`/tunes/sort/dateLearnt/desc`);
+    seePractice = () => this.props.pushRoute(`/${this.props.userId}/tunes/sort/lastPracticedTimestamp/desc`)
+    seeHistory = () => this.props.pushRoute(`/${this.props.userId}/tunes/sort/dateLearnt/desc`);
 
     filterDown = (filterBy, filterTo) => {
-        this.props.pushRoute(`/tunes/filter/${filterBy}/${filterTo}`)
+        this.props.pushRoute(`/${this.props.userId}/tunes/filter/${filterBy}/${filterTo}`)
         const oldFilterCrumbs = localStorage.get('CHOONS/filterCrumbs') || [];
-        oldFilterCrumbs.unshift({title: pretty(filterTo), path: `/tunes/filter/${filterBy}/${filterTo}`});
+        oldFilterCrumbs.unshift({title: pretty(filterTo), path: `/${this.props.userId}/tunes/filter/${filterBy}/${filterTo}`});
 
         const newFilterCrumbs = oldFilterCrumbs.slice(0, 3);
         localStorage.set('CHOONS/filterCrumbs', newFilterCrumbs);
     }
 
     render() {
-        const { tunes, filterKey, filterValue } = this.props;
+        const { userId, myTunes, readTunes, filterKey, filterValue } = this.props;
+
+        const isMine = userId === 'my';
 
         const filterCrumbs = localStorage.get('CHOONS/filterCrumbs') || [];
 
+        const tunes = isMine ? myTunes : readTunes;
+
         return (
             <Row>
-                <Col xs={12} md={12}>
-                    <Route exact path="/tunes" render={(props) => {
+                {tunes && <Col xs={12} md={12}>
+                    <Route exact path={`/${userId}/tunes`} render={(props) => {
                         return (
                             <Row><Col xs={12} md={12}>
-                                <h1>All Choons</h1>
-                                <TuneNav add={true} />
+                                <h1>{`${isMine ? 'All My' : 'All Their'}`} Choons</h1>
+                                <TuneNav userId={userId} add={isMine} />
                                 <Row className="pad-butt"><Col xs={12} md={4}>
                                     <FilterWidget onFilterSelect={this.filterDown} />
                                 </Col><Col xs={12} md={8}>
@@ -79,13 +91,13 @@ class Tunes extends Component {
 
                                 <Row className="pad-butt"><Col xs={12} md={8}>
                                     Recent: {filterCrumbs.map((crumb, i) => (
-                                        <span key={i}>{i > 0 ? ' | ' : ''} <Link to={crumb.path}>{crumb.title}</Link></span>
+                                        <span key={i}>{i > 0 ? ' | ' : ''} <Link to={`/${userId}${crumb.path}`}>{crumb.title}</Link></span>
                                     ))}
                                 </Col></Row>
 
                                 <Typeahead
                                     onChange={(selections) => {
-                                        this.props.pushRoute(`/tunes/view/${selections[0].id}`)
+                                        this.props.pushRoute(`/${userId}/tunes/view/${selections[0].id}`)
                                     }}
                                     maxResults={20}
                                     minLength={3}
@@ -93,40 +105,52 @@ class Tunes extends Component {
                                     labelKey="name"
                                 />
                                 <br />
-                                <TunesTable tunes={sort(tunes).by('name')}/>
+                                <TunesTable
+                                    userId={userId}
+                                        tunes={sort(tunes).by('name')}
+                                />
                             </Col></Row>
                         )
                     }}/>
-                    <Route path="/tunes/byFlag/:flags" render={({ match:{ params: { flags } } }) => (
+                    <Route path={`/${userId}/tunes/byFlag/:flags`} render={({ match:{ params: { flags } } }) => (
                         <div>
                             <h1>Some Choons</h1>
-                            <TuneNav add={true} back={true} />
+                            <TuneNav userId={userId} add={isMine} back={true} />
                             <FilterFlags flags={flags} onSelect={this.setFlags} />
                             <br />
-                            <TunesTable tunes={sort(filter(tunes).byFlags(flags)).by('name')}/>
+                            <TunesTable
+                                userId={userId}
+                                tunes={sort(filter(tunes).byFlags(flags)).by('name')}
+                            />
                         </div>
                     )}/>
-                    <Route path="/tunes/filter/:filterKey?/:filterValue?" render={({ match:{ params: { filterKey, filterValue } } }) => (
+                    <Route path={`/${userId}/tunes/filter/:filterKey?/:filterValue?`} render={({ match:{ params: { filterKey, filterValue } } }) => (
                         <div>
                             <h1>Some Choons</h1>
-                            <TuneNav add={true} back={true} />
-                            <TunesTable tunes={sort(filter(tunes).byKey(filterKey, filterValue)).by('name')} filterKey={filterKey} filterValue={filterValue}/>
+                            <TuneNav userId={userId} add={isMine} back={true} />
+                            <TunesTable
+                                userId={userId}
+                                tunes={sort(filter(tunes).byKey(filterKey, filterValue)).by('name')} filterKey={filterKey} filterValue={filterValue}
+                            />
                         </div>
                     )}/>
-                    <Route path="/tunes/sort/:sortKey?/:sortDir?" render={({match:{params: {sortKey, sortDir}}}) => (
+                    <Route path={`/${userId}/tunes/sort/:sortKey?/:sortDir?`} render={({match:{params: {sortKey, sortDir}}}) => (
                         <div>
                             <h1>Some Choons</h1>
-                            <TuneNav add={true} back={true} />
-                            <TunesTable tunes={sort(tunes.filter((tune) => tune[sortKey])).by(sortKey, sortDir)} sortKey={sortKey} />
+                            <TuneNav userId={userId} add={isMine} back={true} />
+                            <TunesTable
+                                userId={userId}
+                                tunes={sort(tunes.filter((tune) => tune[sortKey])).by(sortKey, sortDir)} sortKey={sortKey}
+                            />
                         </div>
                     )}/>
-                    <Route path="/tunes/view/:tuneId" render={({match:{params: {tuneId}}}) => (
-                        tunes.has(tuneId) ? <TuneView tune={tunes.get(tuneId)}/> : null
+                    <Route path={`/${userId}/tunes/view/:tuneId`} render={({match:{params: {tuneId}}}) => (
+                        tunes.has(tuneId) ? <TuneView tune={tunes.get(tuneId)} userId={userId} /> : null
                     )}/>
-                    <Route path="/tunes/edit/:tuneId" render={({match:{params: {tuneId}}}) => (
+                    {isMine && <Route path={`/${userId}/tunes/edit/:tuneId`} render={({match:{params: {tuneId}}}) => (
                         tunes.has(tuneId) ? <TuneEdit tune={tunes.get(tuneId)}/> : null
-                    )}/>
-                </Col>
+                    )}/>}
+                </Col>}
             </Row>
         );
     }
@@ -152,7 +176,8 @@ const timestampKeys = [
     'dateLearnt'
 ];
 
-function TunesTable({ tunes, filterKey, filterValue, sortKey }) {
+function TunesTable({ tunes, filterKey, filterValue, sortKey, userId }) {
+    const isMine = userId === 'my';
     const timestampColumn = timestampKeys.includes(sortKey) ? sortKey : null;
     return <Table striped bordered hover responsive>
         <thead>
@@ -172,14 +197,14 @@ function TunesTable({ tunes, filterKey, filterValue, sortKey }) {
                 <tr key={tune.id}>
                     <td>{i+1}</td>
                     <td>
-                        <Link to={`/tunes/edit/${tune.id}`}><Button bsSize="small" className="pull-right">Edit</Button></Link>
-                        <Link to={`/tunes/view/${tune.id}`}>{tune.name} <TuneFlags tune={tune} /></Link>
+                        {isMine && <Link to={`/${userId}/tunes/edit/${tune.id}`}><Button bsSize="small" className="pull-right">Edit</Button></Link>}
+                        <Link to={`/${userId}/tunes/view/${tune.id}`}>{tune.name} <TuneFlags tune={tune} /></Link>
                     </td>
-                    <td><Link to={`/tunes/filter/type/${tune.type}`}>{pretty(tune.type)}</Link></td>
-                    <td><Link to={`/tunes/filter/musicKey/${tune.musicKey}`}>{tune.musicKey}</Link></td>
-                    <td><Link to={`/tunes/filter/stage/${tune.stage}`}>{pretty(tune.stage)}</Link></td>
-                    <td><Link to={`/tunes/filter/realm/${tune.realm}`}>{pretty(tune.realm)}</Link></td>
-                    <td><Link to={`/tunes/filter/source/${tune.source}`}>{tune.source}</Link></td>
+                    <td><Link to={`/${userId}/tunes/filter/type/${tune.type}`}>{pretty(tune.type)}</Link></td>
+                    <td><Link to={`/${userId}/tunes/filter/musicKey/${tune.musicKey}`}>{tune.musicKey}</Link></td>
+                    <td><Link to={`/${userId}/tunes/filter/stage/${tune.stage}`}>{pretty(tune.stage)}</Link></td>
+                    <td><Link to={`/${userId}/tunes/filter/realm/${tune.realm}`}>{pretty(tune.realm)}</Link></td>
+                    <td><Link to={`/${userId}/tunes/filter/source/${tune.source}`}>{tune.source}</Link></td>
                     {timestampColumn && <td>{formatTimestamp(tune[sortKey], false)}</td>}
                 </tr>
             )}
@@ -188,11 +213,15 @@ function TunesTable({ tunes, filterKey, filterValue, sortKey }) {
 }
 
 function mapAppStateToProps(state) {
-    const pathMatch = state.router.location.pathname.match(/\/tunes\/filter\/(.+)\/(.+)/);
+    const userIdMatch = state.router.location.pathname.match(/\/(.+)\/tunes/);
+    const filterMatch = state.router.location.pathname.match(/\/tunes\/filter\/(.+)\/(.+)/);
+    const userId = userIdMatch ? userIdMatch[1] : 'my';
     return {
-        tunes: state.tunes,
-        filterKey: pathMatch ? pathMatch[1] : null,
-        filterValue: pathMatch ? pathMatch[2] : null
+        userId,
+        myTunes: state.tunes,
+        readTunes: userIdMatch ? state.readTunes.get(userId) : null,
+        filterKey: filterMatch ? filterMatch[1] : null,
+        filterValue: filterMatch ? filterMatch[2] : null
     }
 }
 
@@ -200,5 +229,6 @@ export default connect(
     mapAppStateToProps,
     {
         pushRoute: push,
+        fetchReadList
     }
 )(Tunes);

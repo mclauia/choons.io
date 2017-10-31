@@ -16,6 +16,14 @@ export default combineReducers({
                 return state;
         }
     },
+    readTunes: (state = Map({}), action) => {
+        switch (action.type) {
+            case 'GOT_READ_TUNES':
+                return state.set(action.payload.userId, Map(action.payload.tunes));
+            default:
+                return state;
+        }
+    },
     user: (state = {}, action) => {
         switch (action.type) {
             case 'USER_AUTHED':

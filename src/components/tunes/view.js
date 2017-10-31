@@ -20,13 +20,15 @@ import {
     countCobwebs
 } from './utils';
 
-export default function TuneView({ tune }) {
-    renderAbcTo(tune.abc, 'tuneHint')
+export default function TuneView({ tune, userId }) {
+    renderAbcTo(tune.abc, 'tuneHint');
+
+    const isMine = userId === 'my';
 
     return (<div>
         <h1>{tune.name} <TuneFlags tune={tune} /></h1>
-        <TuneNav back={true} edit={tune.id} />
-        <TunePractice tune={tune} />
+        <TuneNav back={true} edit={tune.id} userId={userId} />
+        {isMine && <TunePractice tune={tune} />}
         <Table striped bordered hover responsive>
             <tbody>
                 {!!tune.aliases && <tr>

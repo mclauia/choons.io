@@ -99,3 +99,14 @@ export function updateTune(tune, userId) {
     const fireTune = DB.ref(`users/${userId}/${TUNES}/${tune.id}`);
     fireTune.set(tune)
 }
+
+export function getUserTuneList(userId) {
+    return new Promise((resolve) => {
+        const fireTunes = DB.ref(`users/${userId}/${TUNES}`);
+        fireTunes.once('value', (tunesListSnapshot) => {
+            const tunes = tunesListSnapshot.val();
+
+            resolve(tunes);
+        })
+    })
+}

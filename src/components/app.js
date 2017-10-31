@@ -1,9 +1,11 @@
 import React from 'react';
-import { Grid, Row, Col, Navbar, Tabs, Tab } from 'react-bootstrap';
+import { Grid, Row, Col, Nav, NavItem, Navbar, Tabs, Tab } from 'react-bootstrap';
 import { Switch, Route, Redirect, Link, withRouter } from 'react-router-dom';
 
 import Tunes from './tunes';
 import TuneAdd from './tunes/add';
+
+import ReadTunes from './tunes/read';
 // import Practice from './practice';
 
 import 'bootstrap/dist/css/bootstrap.css';
@@ -22,6 +24,9 @@ export default withRouter(({ history }) => {
                         <Link to="/">Choons.io</Link>
                     </Navbar.Brand>
                 </Navbar.Header>
+                <Navbar.Collapse>
+                    <Navbar.Text><Link to="/my/tunes">Back to My Choons</Link></Navbar.Text>
+                </Navbar.Collapse>
             </Navbar>
             <Grid>
                 {/* <Row className="pad-bottom">
@@ -35,11 +40,10 @@ export default withRouter(({ history }) => {
                 <Row>
                     <Col xs={12} md={12}>
                         <Switch>
-                            <Route path="/tunes/add" component={TuneAdd} />
-                            <Route path="/tunes/view/id" component={Tunes} />
-                            <Route path="/tunes" component={Tunes} />
-                            {/* <Route path="/practice" component={Practice} /> */}
-                            <Redirect to="/tunes"/>
+                            <Route path="/my/tunes/add" component={TuneAdd} />
+                            <Route path="/my/tunes" component={Tunes} />
+                            <Route path="/:userId/tunes" component={Tunes} />
+                            <Redirect to="/my/tunes"/>
                         </Switch>
                     </Col>
                 </Row>

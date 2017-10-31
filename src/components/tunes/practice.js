@@ -100,6 +100,7 @@ class TunePractice extends Component {
             </Form></Col></Row>}
             {isPracticing && <div>
                 <h3>Keep practicing!</h3>
+                <h4>{((Date.now() - practiceStart) / 1000 / 60).toFixed(2)} minutes...</h4>
                 <br />
                 <Button bsStyle="success" onClick={() => this.endPractice()}>ok stop practicing</Button>
                 {' '}
