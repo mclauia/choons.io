@@ -30,11 +30,32 @@ export function initAuthApp(dispatch) {
             dispatch({ type: 'USER_AUTHED', payload: user.uid });
 
             const fireTunes = DB.ref(`users/${user.uid}/${TUNES}`);
-            fireTunes.on('value', (fireResponse) => {
-                const tunes = fireResponse.val();
+            fireTunes.once('value', (tunesListSnapshot) => {
+                const tunes = tunesListSnapshot.val();
 
                 dispatch({ type: 'GOT_TUNES', payload: tunes })
             })
+
+            // const fireNewTunes = fireTunes.orderByChild('dateAdded').startAt(Date.now());
+            // fireNewTunes.on('child_added', (tuneSnapshot) => {
+            //     const newTune = tuneSnapshot.val();
+            //     console.log('child_added')
+            //     dispatch({ type: 'GOT_TUNE', payload: newTune })
+            // })
+            fireTunes.on('child_changed', (tuneSnapshot) => {
+                const nextTune = tuneSnapshot.val();
+                console.log('child_changed')
+                dispatch({ type: 'GOT_TUNE', payload: nextTune })
+            })
+
+            var connectedRef = DB.ref('.info/connected');
+            connectedRef.on('value', function(connectionSnap) {
+                if (connectionSnap.val() === true) {
+                    dispatch({ type: 'USER_IS_CONNECTED' })
+                } else {
+                    dispatch({ type: 'USER_DISCONNECTED' })
+                }
+            });
         } else {
             // No user is signed in.
             auth.signInWithRedirect(authProvider);
@@ -69,6 +90,7 @@ export function pushNewTune(tune, userId) {
 
     next.set({
         id: tuneId,
+        dateAdded: firebase.database.ServerValue.TIMESTAMP,
         ...tune
     });
 }

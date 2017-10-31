@@ -51,8 +51,7 @@ class TuneAdd extends Component {
             video: this.state.videoValue,
             notes: this.state.notesValue,
             stage: this.state.stageValue,
-            abc: this.state.hintValue,
-            dateAdded: Date.now()
+            abc: this.state.hintValue
         });
         this.props.goBack();
     }
@@ -112,6 +111,7 @@ class TuneAdd extends Component {
                         <TuneRealmSelect value={this.state.realmValue}
                             onChange={(e) => {
                                 this.setState({ realmValue: e.target.value })
+                                localStorage.set(`CHOONS/newTune/realm`, e.target.value)
                             }}
                         />
                     </FormGroup>

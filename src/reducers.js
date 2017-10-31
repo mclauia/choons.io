@@ -9,6 +9,9 @@ export default combineReducers({
         switch (action.type) {
             case 'GOT_TUNES':
                 return Map(action.payload);
+            case 'GOT_TUNE':
+                const itemId = action.payload.id;
+                return state.set(itemId, action.payload);
             default:
                 return state;
         }
