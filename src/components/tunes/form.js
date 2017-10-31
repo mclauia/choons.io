@@ -23,6 +23,7 @@ export function TuneTypeSelect(props) {
             <option value="air">Air</option>
             <option value="barndance">Barndance</option>
             <option value="7dance">7 Dance</option>
+            <option value="gigue">Gigue</option>
         </FormControl>
     )
 }

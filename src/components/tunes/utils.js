@@ -149,6 +149,7 @@ pretty.texts = {
     air: 'Air',
     barndance: 'Barndance',
     '7dance': '7 Dance',
+    gigue: 'Gigue',
 
     irish: 'Irish',
     quebecois: 'Québécois',
