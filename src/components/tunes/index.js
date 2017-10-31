@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Route, Link } from 'react-router-dom';
 import localStorage from 'local-storage';
 import {
-    Button,
+    Button, Alert,
     Row, Col, Table,
     ButtonToolbar, ToggleButtonGroup, ToggleButton,
 } from 'react-bootstrap';
@@ -18,7 +18,7 @@ import TuneNav from './nav'
 import FilterWidget from './filter';
 import { filter, sort, pretty, formatTimestamp } from './utils';
 
-import { fetchReadList } from './read';
+import { fetchReadList, importTune } from './read';
 
 class Tunes extends Component {
     state = {
@@ -56,7 +56,7 @@ class Tunes extends Component {
     }
 
     render() {
-        const { userId, myTunes, readTunes, filterKey, filterValue } = this.props;
+        const { userId, myTunes, readTunes, filterKey, filterValue, message } = this.props;
 
         const isMine = userId === 'my';
 
@@ -67,6 +67,7 @@ class Tunes extends Component {
         return (
             <Row>
                 {tunes && <Col xs={12} md={12}>
+                    {message && <Alert>{message}</Alert>}
                     <Route exact path={`/${userId}/tunes`} render={(props) => {
                         return (
                             <Row><Col xs={12} md={12}>
@@ -107,7 +108,8 @@ class Tunes extends Component {
                                 <br />
                                 <TunesTable
                                     userId={userId}
-                                        tunes={sort(tunes).by('name')}
+                                    onImport={this.props.importTune}
+                                    tunes={sort(tunes).by('name')}
                                 />
                             </Col></Row>
                         )
@@ -121,6 +123,7 @@ class Tunes extends Component {
                             <TunesTable
                                 userId={userId}
                                 tunes={sort(filter(tunes).byFlags(flags)).by('name')}
+                                onImport={this.props.importTune}
                             />
                         </div>
                     )}/>
@@ -131,6 +134,7 @@ class Tunes extends Component {
                             <TunesTable
                                 userId={userId}
                                 tunes={sort(filter(tunes).byKey(filterKey, filterValue)).by('name')} filterKey={filterKey} filterValue={filterValue}
+                                onImport={this.props.importTune}
                             />
                         </div>
                     )}/>
@@ -141,11 +145,16 @@ class Tunes extends Component {
                             <TunesTable
                                 userId={userId}
                                 tunes={sort(tunes.filter((tune) => tune[sortKey])).by(sortKey, sortDir)} sortKey={sortKey}
+                                onImport={this.props.importTune}
                             />
                         </div>
                     )}/>
                     <Route path={`/${userId}/tunes/view/:tuneId`} render={({match:{params: {tuneId}}}) => (
-                        tunes.has(tuneId) ? <TuneView tune={tunes.get(tuneId)} userId={userId} /> : null
+                        tunes.has(tuneId) ? <TuneView
+                            tune={tunes.get(tuneId)}
+                            userId={userId}
+                            onImport={this.props.importTune}
+                         /> : null
                     )}/>
                     {isMine && <Route path={`/${userId}/tunes/edit/:tuneId`} render={({match:{params: {tuneId}}}) => (
                         tunes.has(tuneId) ? <TuneEdit tune={tunes.get(tuneId)}/> : null
@@ -176,7 +185,7 @@ const timestampKeys = [
     'dateLearnt'
 ];
 
-function TunesTable({ tunes, filterKey, filterValue, sortKey, userId }) {
+function TunesTable({ tunes, filterKey, filterValue, sortKey, userId, onImport }) {
     const isMine = userId === 'my';
     const timestampColumn = timestampKeys.includes(sortKey) ? sortKey : null;
     return <Table striped bordered hover responsive>
@@ -197,7 +206,10 @@ function TunesTable({ tunes, filterKey, filterValue, sortKey, userId }) {
                 <tr key={tune.id}>
                     <td>{i+1}</td>
                     <td>
-                        {isMine && <Link to={`/${userId}/tunes/edit/${tune.id}`}><Button bsSize="small" className="pull-right">Edit</Button></Link>}
+                        {isMine && <Link to={`/${userId}/tunes/edit/${tune.id}`}>
+                            <Button bsSize="small" className="pull-right">Edit</Button>
+                        </Link>}
+                        {!isMine && <Button bsSize="small" className="pull-right" onClick={() => onImport(tune)}>Import</Button>}
                         <Link to={`/${userId}/tunes/view/${tune.id}`}>{tune.name} <TuneFlags tune={tune} /></Link>
                     </td>
                     <td><Link to={`/${userId}/tunes/filter/type/${tune.type}`}>{pretty(tune.type)}</Link></td>
@@ -221,7 +233,8 @@ function mapAppStateToProps(state) {
         myTunes: state.tunes,
         readTunes: userIdMatch ? state.readTunes.get(userId) : null,
         filterKey: filterMatch ? filterMatch[1] : null,
-        filterValue: filterMatch ? filterMatch[2] : null
+        filterValue: filterMatch ? filterMatch[2] : null,
+        message: state.messages
     }
 }
 
@@ -229,6 +242,7 @@ export default connect(
     mapAppStateToProps,
     {
         pushRoute: push,
-        fetchReadList
+        fetchReadList,
+        importTune
     }
 )(Tunes);

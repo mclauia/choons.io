@@ -89,9 +89,9 @@ export function pushNewTune(tune, userId) {
     const tuneId = next.key;
 
     next.set({
+        ...tune,
         id: tuneId,
         dateAdded: firebase.database.ServerValue.TIMESTAMP,
-        ...tune
     });
 }
 

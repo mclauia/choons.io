@@ -1,7 +1,7 @@
 // react bindings
 import React from 'react';
 import {
-    Table, OverlayTrigger, Tooltip
+    Table, OverlayTrigger, Tooltip, Button, Alert
 } from 'react-bootstrap';
 import format from 'date-fns/format';
 
@@ -20,7 +20,7 @@ import {
     countCobwebs
 } from './utils';
 
-export default function TuneView({ tune, userId }) {
+export default function TuneView({ tune, userId, onImport }) {
     renderAbcTo(tune.abc, 'tuneHint');
 
     const isMine = userId === 'my';
@@ -29,6 +29,10 @@ export default function TuneView({ tune, userId }) {
         <h1>{tune.name} <TuneFlags tune={tune} /></h1>
         <TuneNav back={true} edit={tune.id} userId={userId} />
         {isMine && <TunePractice tune={tune} />}
+        {!isMine && <Alert>
+            <h4>Know this one? Copy it to your choons~</h4>
+            <Button bsStyle="success" onClick={() => onImport(tune)}>Import to My Choons</Button>
+        </Alert>}
         <Table striped bordered hover responsive>
             <tbody>
                 {!!tune.aliases && <tr>

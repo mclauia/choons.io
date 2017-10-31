@@ -31,5 +31,15 @@ export default combineReducers({
             default:
                 return state;
         }
-    }
+    },
+    messages: (state = '', action) => {
+        switch (action.type) {
+            case '@@router/LOCATION_CHANGE':
+                return '';
+            case 'TUNE_IMPORTED':
+                return 'Tune copied to your Choons list!'
+            default:
+                return state;
+        }
+    },
 });
