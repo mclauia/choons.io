@@ -15,6 +15,10 @@ export function hasCobwebs(tune) {
     return (Date.now() - tune.lastPracticedTimestamp) / 1000 / 60 / 60 / 24 > 7;
 }
 
+export function countCobwebs(tune) {
+    return Math.floor((Date.now() - tune.lastPracticedTimestamp) / 1000 / 60 / 60 / 24 / 7);
+}
+
 // practiced in the last month
 export function wasAddedRecently(tune) {
     return (Date.now() - tune.dateAdded) / 1000 / 60 / 60 / 24 < 31;

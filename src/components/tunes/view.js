@@ -16,7 +16,8 @@ import {
     wasForgotten,
     isPracticedALot,
     pretty,
-    renderAbcTo
+    renderAbcTo,
+    countCobwebs
 } from './utils';
 
 export default function TuneView({ tune }) {
@@ -101,7 +102,7 @@ export function TuneFlags({ tune }) {
         }
         {hasCobwebs(tune) &&
             <OverlayTrigger placement="bottom" overlay={<Tooltip id="hasCobwebsTip">not recently practiced</Tooltip>}>
-                <span role="img" aria-label="Hasn't been practiced recently">🕸 </span>
+                <span>{Array(countCobwebs(tune)).fill().map((_, i) => <span key={i} role="img" aria-label="Hasn't been practiced recently">🕸</span>)}</span>
             </OverlayTrigger>
         }
         {wasAddedRecently(tune) &&
