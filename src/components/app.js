@@ -21,7 +21,7 @@ export default withRouter(({ history }) => {
             <Navbar>
                 <Navbar.Header>
                     <Navbar.Brand>
-                        <Link to="/">Choons.io</Link>
+                        <Link to="/">Choons.io <sup className="text-warning"><strong>BETA</strong></sup></Link>
                     </Navbar.Brand>
                 </Navbar.Header>
                 <Navbar.Collapse>
