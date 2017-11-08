@@ -26,7 +26,7 @@ export function wasAddedRecently(tune) {
 
 // was added a while ago and never learned
 export function wasForgotten(tune) {
-    return !tune.dateLearnt && (Date.now() - tune.dateAdded) / 1000 / 60 / 60 / 24 > 31;
+    return !tune.dateLearnt && (!tune.dateAdded || (Date.now() - tune.dateAdded) / 1000 / 60 / 60 / 24 > 31);
 }
 
 // was learned in the last month
@@ -55,6 +55,32 @@ export const sort = (tunes) => ({
         })
     }
 })
+
+export function getSortForFlags(flags) {
+    switch (flags) {
+        case '🔰': {
+            return ['dateLearnt', 'desc']
+        }
+        case '🎻': {
+            return ['lastPracticedTimestamp', 'desc']
+        }
+        case '🌕': {
+            return ['dateAdded', 'desc']
+        }
+        case '🕸': {
+            return ['lastPracticedTimestamp', 'asc']
+        }
+        case '🌑': {
+            return ['dateAdded', 'desc']
+        }
+        case '⭐': {
+            return ['name', 'asc']
+        }
+        default: {
+            return ['name', 'asc'];
+        }
+    }
+}
 
 export const filter = (tunes) => ({
     byKey: (filterKey, filterValue) => {

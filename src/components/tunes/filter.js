@@ -24,8 +24,8 @@ export default class FilterWidget extends Component {
                     <option value="musicKey">Key</option>
                     <option value="stage">Stage</option>
                     <option value="realm">Realm</option>
-                    {/*<option value="source">Source</option>
-                    <option value="session">Session</option>*/}
+                    <option value="source">Source</option>
+                    <option value="session">Session</option>
                 </FormControl>
                 {this.state.filterBy === 'type' &&
                     <TuneTypeSelect value={this.state.filterTo} onChange={(e) => {
@@ -60,6 +60,32 @@ export default class FilterWidget extends Component {
                         <option value="drill">Drill it</option>
                         <option value="perform">Perform it</option>
                         <option value="embellish">Embellish it</option>
+                    </FormControl>
+                }
+                {this.state.filterBy === 'source' &&
+                    <FormControl
+                        componentClass="select"
+                        value={this.state.filterTo}
+                        onChange={(e) => {
+                            this.setState({ filterTo: e.target.value })
+                            this.props.onFilterSelect(this.state.filterBy, e.target.value);
+                        }}
+                    >
+                        <option value="">-- Choose Source --</option>
+                        {this.props.sources.map((source, i) => <option key={i} value={source}>{source}</option>)}
+                    </FormControl>
+                }
+                {this.state.filterBy === 'session' &&
+                    <FormControl
+                        componentClass="select"
+                        value={this.state.filterTo}
+                        onChange={(e) => {
+                            this.setState({ filterTo: e.target.value })
+                            this.props.onFilterSelect(this.state.filterBy, e.target.value);
+                        }}
+                    >
+                        <option value="">-- Choose Session --</option>
+                        {this.props.sessions.map((session, i) => <option key={i} value={session}>{session}</option>)}
                     </FormControl>
                 }
             </div>

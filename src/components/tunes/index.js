@@ -16,7 +16,7 @@ import TuneView, { TuneFlags } from './view'
 import TuneEdit from './edit'
 import TuneNav from './nav'
 import FilterWidget from './filter';
-import { filter, sort, pretty, formatTimestamp } from './utils';
+import { filter, sort, pretty, formatTimestamp, getSortForFlags } from './utils';
 
 import { fetchReadList, importTune } from './read';
 
@@ -56,7 +56,7 @@ class Tunes extends Component {
     }
 
     render() {
-        const { userId, myTunes, readTunes, filterKey, filterValue, message } = this.props;
+        const { userId, myTunes, readTunes, filterKey, filterValue, message, sessions, sources } = this.props;
 
         const isMine = userId === 'my';
 
@@ -74,7 +74,7 @@ class Tunes extends Component {
                                 <h1>{`${isMine ? 'All My' : 'All Their'}`} Choons</h1>
                                 <TuneNav userId={userId} add={isMine} />
                                 <Row className="pad-butt"><Col xs={12} md={4}>
-                                    <FilterWidget onFilterSelect={this.filterDown} />
+                                    <FilterWidget onFilterSelect={this.filterDown} sessions={sessions} sources={sources} />
                                 </Col><Col xs={12} md={8}>
                                     <div className="pull-left">
                                         <FilterFlags flags={''} onSelect={this.setFlags} />
@@ -83,10 +83,10 @@ class Tunes extends Component {
                                         <FilterRealms onSelect={this.setRealms} />
                                     </div>*/}
                                     <div className="pull-left" style={{ marginLeft: 10 }}>
-                                        <Button onClick={this.seePractice}>Practice</Button>
+                                        <Button onClick={this.seePractice}>Practice History</Button>
                                     </div>
                                     <div className="pull-left" style={{ marginLeft: 10 }}>
-                                        <Button onClick={this.seeHistory}>History</Button>
+                                        <Button onClick={this.seeHistory}>Learnt History</Button>
                                     </div>
                                 </Col></Row>
 
@@ -122,7 +122,7 @@ class Tunes extends Component {
                             <br />
                             <TunesTable
                                 userId={userId}
-                                tunes={sort(filter(tunes).byFlags(flags)).by('name')}
+                                tunes={sort(filter(tunes).byFlags(flags)).by(...getSortForFlags(flags))}
                                 onImport={this.props.importTune}
                             />
                         </div>
@@ -182,7 +182,8 @@ function FilterFlags({ flags, onSelect }) {
 
 const timestampKeys = [
     'lastPracticedTimestamp',
-    'dateLearnt'
+    'dateLearnt',
+    'dateAdded'
 ];
 
 function TunesTable({ tunes, filterKey, filterValue, sortKey, userId, onImport }) {
@@ -234,7 +235,9 @@ function mapAppStateToProps(state) {
         readTunes: userIdMatch ? state.readTunes.get(userId) : null,
         filterKey: filterMatch ? filterMatch[1] : null,
         filterValue: filterMatch ? filterMatch[2] : null,
-        message: state.messages
+        message: state.messages,
+        sessions: state.sessions.toJS(),
+        sources: state.sources.toJS(),
     }
 }
 
