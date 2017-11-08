@@ -98,7 +98,7 @@ class TunePractice extends Component {
                     </InputGroup.Button>
                     <FormControl
                         value={this.state.practiceValue}
-                        type="text"
+                        type="number"
                         onChange={(e) => this.setState({ practiceValue: e.target.value })}
                     />
                     <InputGroup.Button>

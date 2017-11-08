@@ -93,7 +93,7 @@ export default function TuneView({ tune, userId, onImport }) {
                 </tr>}
                 {!!tune.notes && <tr>
                     <td><strong>Notes</strong></td>
-                    <td>{tune.notes}</td>
+                    <td>{tune.notes.split('\n').map((line, i) => <p key={i}>{line}</p>)}</td>
                 </tr>}
                 {!!tune.abc && <tr>
                     <td><strong>Hint</strong></td>

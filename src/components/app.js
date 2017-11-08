@@ -6,6 +6,7 @@ import Tunes from './tunes';
 import TuneAdd from './tunes/add';
 
 import ReadTunes from './tunes/read';
+import Help from './static/help';
 // import Practice from './practice';
 
 import 'bootstrap/dist/css/bootstrap.css';
@@ -14,8 +15,8 @@ import 'bootstrap/dist/css/bootstrap-theme.css';
 import './app.css';
 
 export default withRouter(({ history }) => {
-    const pathMatch = history.location.pathname.match(/^\/(\w+)/);
-    const currentTab = pathMatch ? pathMatch[1] : 'tunes';
+    const pathMatch = history.location.pathname.match(/^\/(.+)/);
+    const currentTab = pathMatch ? (pathMatch[1].includes('tunes') ? 'tunes' : pathMatch[1]) : 'tunes';
     return (
         <div>
             <Navbar>
@@ -29,25 +30,34 @@ export default withRouter(({ history }) => {
                 </Navbar.Collapse>
             </Navbar>
             <Grid>
-                {/* <Row className="pad-bottom">
+                <Row className="pad-bottom">
                     <Col xs={12} md={12}>
                         <Tabs id="ok" activeKey={currentTab} onSelect={(route) => history.push(`/${route}`)}>
                             <Tab eventKey={'tunes'} title="Tunes" />
-                            <Tab eventKey={'practice'} title="Practice" />
+                            <Tab eventKey={'help'} title="Help" />
                         </Tabs>
                     </Col>
-                </Row> */}
+                </Row>
                 <Row>
                     <Col xs={12} md={12}>
                         <Switch>
                             <Route path="/my/tunes/add" component={TuneAdd} />
                             <Route path="/my/tunes" component={Tunes} />
                             <Route path="/:userId/tunes" component={Tunes} />
+
+                            <Route path="/help" component={Help} />
                             <Redirect to="/my/tunes"/>
                         </Switch>
                     </Col>
                 </Row>
             </Grid>
+            <div style={{ background: '#e7e7e7', marginTop: 20, padding: 10 }}><Grid>
+                <Row className="pull-right">
+                    <Col xs={12} md={12}>
+                        <span className="text-muted">App designed & written by Ian McLaughlin, &copy; 2017. User data belongs to users.</span>
+                    </Col>
+                </Row>
+            </Grid></div>
         </div>
     );
 });
