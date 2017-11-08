@@ -48,6 +48,12 @@ export function initAuthApp(dispatch) {
                 dispatch({ type: 'GOT_TUNE', payload: nextTune })
             })
 
+            fireTunes.on('child_removed', (tuneSnapshot) => {
+                const deletedTune = tuneSnapshot.val();
+                console.log('child_removed')
+                dispatch({ type: 'DELETED_TUNE', payload: deletedTune })
+            })
+
             var connectedRef = DB.ref('.info/connected');
             connectedRef.on('value', function(connectionSnap) {
                 if (connectionSnap.val() === true) {

@@ -12,7 +12,7 @@ import { updateTune } from '../../firebase';
 
 import TuneNav from './nav'
 import { getDefaultHintFor } from './utils';
-import { TuneTypeSelect, TuneKeySelect, TuneRealmSelect, TuneHintEditor } from './form';
+import { TuneTypeSelect, TuneKeySelect, TuneRealmSelect, TuneHintEditor, TuneStageSelect } from './form';
 
 class TuneEdit extends Component {
     constructor(props) {
@@ -25,6 +25,7 @@ class TuneEdit extends Component {
             typeValue: tune.type || '',
             musicKeyValue: tune.musicKey || '',
             realmValue: tune.realm || '',
+            stageValue: tune.stage || '',
             sourceValue: tune.source || '',
             sessionValue: tune.session || '',
             notesValue: tune.notes || '',
@@ -196,6 +197,17 @@ class TuneEdit extends Component {
                             onChange={(e) => this.setState({ dotsValue: e.target.value })}
                         />
                     </FormGroup>
+
+                    <FormGroup controlId="tuneStage">
+                        <ControlLabel>Stage</ControlLabel>
+                        {' '}
+                        <TuneStageSelect value={this.state.stageValue}
+                            onChange={(e) => {
+                                this.setState({ stageValue: e.target.value })
+                            }}
+                        />
+                    </FormGroup>
+
 
                     <FormGroup controlId="tuneNotes">
                         <ControlLabel>Notes</ControlLabel>

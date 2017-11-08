@@ -71,6 +71,21 @@ export function TuneRealmSelect(props) {
     )
 }
 
+export function TuneStageSelect(props) {
+    return (
+        <FormControl
+            componentClass="select"
+            {...props}
+        >
+            <option value="">-- Choose Stage --</option>
+            <option value="learn">Learn -- don't know the fingers</option>
+            <option value="enhance">Work on it -- just missing some fingers</option>
+            <option value="drill">Drill it -- got the fingers; play it a thousand times</option>
+            <option value="perform">Perform it -- you got this</option>
+        </FormControl>
+    )
+}
+
 export function TuneHintEditor(props) {
     renderAbcTo(props.value, 'tuneHintPreview')
 

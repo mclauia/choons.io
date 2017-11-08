@@ -36,8 +36,17 @@ class TunePractice extends Component {
         }
     }
 
+    bumpTimer = () => {
+        if (this.state.isPracticing) {
+            this.setState({ bump: Date.now() })
+            // @todo if we have unmounted, this will warn
+            setTimeout(() => this.bumpTimer(), 1000)
+        }
+    }
     startPractice = () => {
         this.setState({ isPracticing: true, practiceStart: Date.now(), practiceEnd: null })
+
+        setTimeout(() => this.bumpTimer(), 1000)
     }
     endPractice = (learnt) => {
         const { tune } = this.props;

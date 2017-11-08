@@ -13,7 +13,7 @@ import { pushNewTune } from '../../firebase';
 
 import TuneNav from './nav'
 import { getDefaultHintFor } from './utils'
-import { TuneTypeSelect, TuneKeySelect, TuneRealmSelect, TuneHintEditor } from './form';
+import { TuneTypeSelect, TuneKeySelect, TuneRealmSelect, TuneHintEditor, TuneStageSelect } from './form';
 
 class TuneAdd extends Component {
     constructor(props) {
@@ -34,7 +34,7 @@ class TuneAdd extends Component {
             sourceValue: cachedTuneData.source || '',
             sessionValue: cachedTuneData.session || '',
             videoValue: '',
-            stageValue: '',
+            stageValue: 'learn',
             notesValue: '',
             hintValue: '',
         }
@@ -158,17 +158,11 @@ class TuneAdd extends Component {
                     <FormGroup controlId="tuneStage">
                         <ControlLabel>Stage</ControlLabel>
                         {' '}
-                        <FormControl
-                            componentClass="select"
-                            value={this.state.stageValue}
+                        <TuneStageSelect value={this.state.stageValue}
                             onChange={(e) => {
                                 this.setState({ stageValue: e.target.value })
                             }}
-                        >
-                            <option value="learn">Learn</option>
-                            <option value="enhance">Work on it</option>
-                            <option value="drill">Drill it</option>
-                        </FormControl>
+                        />
                     </FormGroup>
                     <FormGroup controlId="tuneNotes">
                         <ControlLabel>Notes</ControlLabel>
