@@ -5,6 +5,14 @@ import { Map, Set } from 'immutable';
 export default combineReducers({
     // stores route state
     router: routerReducer,
+    areTunesPublic: (state = false, action) => {
+        switch (action.type) {
+            case 'GOT_PUBLICNESS':
+                return action.payload;
+            default:
+                return state;
+        }
+    },
     tunes: (state = Map({}), action) => {
         switch (action.type) {
             case 'GOT_TUNES':

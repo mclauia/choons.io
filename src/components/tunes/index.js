@@ -1,14 +1,15 @@
 // react bindings
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Route, Link } from 'react-router-dom';
+import { Route, Link, Redirect } from 'react-router-dom';
 import localStorage from 'local-storage';
 import {
-    Button, Alert,
+    Button, Alert, Glyphicon, HelpBlock,
     Row, Col, Table,
     ButtonToolbar, ToggleButtonGroup, ToggleButton,
 } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { push } from 'react-router-redux';
 
@@ -19,6 +20,7 @@ import FilterWidget from './filter';
 import { filter, sort, pretty, formatTimestamp, getSortForFlags } from './utils';
 
 import { fetchReadList, importTune } from './read';
+import { updatePublicFlag } from '../../firebase';
 
 class Tunes extends Component {
     state = {
@@ -56,7 +58,18 @@ class Tunes extends Component {
     }
 
     render() {
-        const { userId, myTunes, readTunes, filterKey, filterValue, message, sessions, sources } = this.props;
+        const {
+            userId,
+            currentUserId,
+            myTunes,
+            areTunesPublic,
+            readTunes,
+            filterKey,
+            filterValue,
+            message,
+            sessions,
+            sources
+        } = this.props;
 
         const isMine = userId === 'my';
 
@@ -92,12 +105,48 @@ class Tunes extends Component {
 
         return (
             <Row>
-                {tunes && <Col xs={12} md={12}>
+                {tunes && !!tunes.size && <Col xs={12} md={12}>
                     {message && <Alert>{message}</Alert>}
+                    <Route path={`/${userId}/tunes`} render={() => (
+                      userId === currentUserId ? (
+                        <Redirect to="/my/tunes"/>
+                      ) : (
+                        null
+                      )
+                    )}/>
                     <Route exact path={`/${userId}/tunes`} render={(props) => {
                         return (
                             <Row><Col xs={12} md={12}>
                                 <h1>{`${isMine ? 'All My' : 'All Their'}`} Choons</h1>
+                                {isMine && <Row className="pad-butt"><Col xs={12} md={6}>
+                                    <h4>{areTunesPublic ? <Glyphicon glyph="eye-open" /> : <Glyphicon glyph="eye-close" />}
+                                    {' '}
+                                    Choons are currently {areTunesPublic ? 'public' : 'private'}</h4>
+                                </Col><Col xs={12} md={6}><div className="pull-right">
+                                    {!areTunesPublic &&
+                                        <Button bsStyle="warning" onClick={() => {
+                                            this.props.setPublic(true);
+                                        }}>
+                                            Go Public
+                                        </Button>
+                                    }
+                                    {areTunesPublic &&
+                                        <div>
+                                            <CopyToClipboard text={`${window.location.origin}/${currentUserId}/tunes`}>
+                                                <Button bsStyle="info">
+                                                    <Glyphicon glyph="copy" /> My Public URL
+                                                </Button>
+                                            </CopyToClipboard>
+                                            {' '}
+                                            <Button bsStyle="warning" onClick={() => {
+                                                this.props.setPublic(false);
+                                            }}
+                                            >
+                                                Go Private
+                                            </Button>
+                                        </div>
+                                    }
+                                </div></Col></Row>}
                                 <TuneNav userId={userId} add={isMine} />
                                 {FilterSortRow}
 
@@ -121,7 +170,8 @@ class Tunes extends Component {
                     }}/>
                     <Route path={`/${userId}/tunes/byFlag/:flags`} render={({ match:{ params: { flags } } }) => (
                         <div>
-                            <h1>{flags} Choons</h1>
+                            <h2>{flags} Choons</h2>
+                            <HelpBlock>{helpify(flags)}</HelpBlock>
                             <TuneNav userId={userId} add={isMine} back={true} />
                             {FilterSortRow}
                             <br />
@@ -134,7 +184,7 @@ class Tunes extends Component {
                     )}/>
                     <Route path={`/${userId}/tunes/filter/:filterKey?/:filterValue?`} render={({ match:{ params: { filterKey, filterValue } } }) => (
                         <div>
-                            <h1>{headerify(filterKey, filterValue)}</h1>
+                            <h2>{headerify(filterKey, filterValue)}</h2>
                             <TuneNav userId={userId} add={isMine} back={true} />
                             {FilterSortRow}
                             <TunesTable
@@ -146,7 +196,7 @@ class Tunes extends Component {
                     )}/>
                     <Route path={`/${userId}/tunes/sort/:sortKey?/:sortDir?`} render={({match:{params: {sortKey, sortDir}}}) => (
                         <div>
-                            <h1>Choons by {pretty(sortKey)}</h1>
+                            <h2>Choons by {pretty(sortKey)}</h2>
                             <TuneNav userId={userId} add={isMine} back={true} />
                             {FilterSortRow}
                             <TunesTable
@@ -167,6 +217,7 @@ class Tunes extends Component {
                         tunes.has(tuneId) ? <TuneEdit tune={tunes.get(tuneId)} userId={userId} /> : null
                     )}/>}
                 </Col>}
+                {(!tunes || !tunes.size) && <Col md={12}><h3>Starting Choons Engine... 🚂💨</h3></Col>}
             </Row>
         );
     }
@@ -238,7 +289,9 @@ function mapAppStateToProps(state) {
     const userId = userIdMatch ? userIdMatch[1] : 'my';
     return {
         userId,
+        currentUserId: state.user,
         myTunes: state.tunes,
+        areTunesPublic: state.areTunesPublic,
         readTunes: userIdMatch ? state.readTunes.get(userId) : null,
         filterKey: filterMatch ? filterMatch[1] : null,
         filterValue: filterMatch ? filterMatch[2] : null,
@@ -253,7 +306,10 @@ export default connect(
     {
         pushRoute: push,
         fetchReadList,
-        importTune
+        importTune,
+        setPublic: (isPublic) => (dispatch, getState) => {
+            updatePublicFlag(getState().user, isPublic);
+        }
     }
 )(Tunes);
 
@@ -292,5 +348,31 @@ function headerify(filterKey, filterValue) {
 
         default:
             return ''
+    }
+}
+
+function helpify(flags) {
+    switch (flags) {
+        case '🔰': {
+            return 'Fresh Choons, learnt in the past month.';
+        }
+        case '🎻': {
+            return 'Choons practiced in the past week.';
+        }
+        case '🌕': {
+            return 'Choons added in the past month.';
+        }
+        case '🕸': {
+            return 'A cobweb for every week out of practice!';
+        }
+        case '🌑': {
+            return 'Choons added more than a month ago, but never learnt...'
+        }
+        case '⭐': {
+            return 'Veteran tunes. Must be favorites!';
+        }
+        default: {
+            return '';
+        }
     }
 }

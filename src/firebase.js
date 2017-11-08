@@ -28,7 +28,9 @@ export function initAuthApp(dispatch) {
             // User is signed in.
             // console.log('on auth change', user)
             dispatch({ type: 'USER_AUTHED', payload: user.uid });
-
+            DB.ref(`users/${user.uid}/public`).on('value', (snap) => {
+                dispatch({ type: 'GOT_PUBLICNESS', payload: snap.val() });
+            })
             const fireTunes = DB.ref(`users/${user.uid}/${TUNES}`);
             fireTunes.once('value', (tunesListSnapshot) => {
                 const tunes = tunesListSnapshot.val();
@@ -115,4 +117,9 @@ export function getUserTuneList(userId) {
             resolve(tunes);
         })
     })
+}
+
+export function updatePublicFlag(userId, isPublic) {
+    const fireTune = DB.ref(`users/${userId}/public`);
+    fireTune.set(isPublic)
 }
