@@ -132,7 +132,9 @@ class Tunes extends Component {
                                     }
                                     {areTunesPublic &&
                                         <div>
-                                            <CopyToClipboard text={`${window.location.origin}/${currentUserId}/tunes`}>
+                                            <CopyToClipboard
+                                                text={`${window.location.origin}/${currentUserId}/tunes`}
+                                                onCopy={() => this.props.copiedURL()}>
                                                 <Button bsStyle="info">
                                                     <Glyphicon glyph="copy" /> My Public URL
                                                 </Button>
@@ -283,36 +285,6 @@ function TunesTable({ tunes, filterKey, filterValue, sortKey, userId, onImport }
     </Table>
 }
 
-function mapAppStateToProps(state) {
-    const userIdMatch = state.router.location.pathname.match(/\/(.+)\/tunes/);
-    const filterMatch = state.router.location.pathname.match(/\/tunes\/filter\/(.+)\/(.+)/);
-    const userId = userIdMatch ? userIdMatch[1] : 'my';
-    return {
-        userId,
-        currentUserId: state.user,
-        myTunes: state.tunes,
-        areTunesPublic: state.areTunesPublic,
-        readTunes: userIdMatch ? state.readTunes.get(userId) : null,
-        filterKey: filterMatch ? filterMatch[1] : null,
-        filterValue: filterMatch ? filterMatch[2] : null,
-        message: state.messages,
-        sessions: state.sessions.toJS(),
-        sources: state.sources.toJS(),
-    }
-}
-
-export default connect(
-    mapAppStateToProps,
-    {
-        pushRoute: push,
-        fetchReadList,
-        importTune,
-        setPublic: (isPublic) => (dispatch, getState) => {
-            updatePublicFlag(getState().user, isPublic);
-        }
-    }
-)(Tunes);
-
 function headerify(filterKey, filterValue) {
     switch (filterKey) {
         case 'type':
@@ -376,3 +348,35 @@ function helpify(flags) {
         }
     }
 }
+
+function mapAppStateToProps(state) {
+    const userIdMatch = state.router.location.pathname.match(/\/(.+)\/tunes/);
+    const filterMatch = state.router.location.pathname.match(/\/tunes\/filter\/(.+)\/(.+)/);
+    const userId = userIdMatch ? userIdMatch[1] : 'my';
+    return {
+        userId,
+        currentUserId: state.user,
+        myTunes: state.tunes,
+        areTunesPublic: state.areTunesPublic,
+        readTunes: userIdMatch ? state.readTunes.get(userId) : null,
+        filterKey: filterMatch ? filterMatch[1] : null,
+        filterValue: filterMatch ? filterMatch[2] : null,
+        message: state.messages,
+        sessions: state.sessions.toJS(),
+        sources: state.sources.toJS(),
+    }
+}
+
+export default connect(
+    mapAppStateToProps,
+    {
+        pushRoute: push,
+        fetchReadList,
+        importTune,
+        setPublic: (isPublic) => (dispatch, getState) => {
+            updatePublicFlag(getState().user, isPublic);
+            dispatch({ type: 'PUBLICNESS_CHANGED', payload: isPublic })
+        },
+        copiedURL: () => ({ type: 'URL_COPIED' })
+    }
+)(Tunes);

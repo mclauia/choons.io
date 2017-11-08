@@ -245,7 +245,11 @@ export default connect(
     mapAppStateToProps,
     {
         persistTuneChanges: (tune) => (dispatch, getState) => {
-            updateTune(tune, getState().user)
+            updateTune(tune, getState().user);
+            setTimeout(() => {
+                dispatch({ type: 'TUNE_SAVED' })
+                window.scrollTo(0, 0)
+            }, 250); // nice
         },
         pushRoute: push,
         goBack,

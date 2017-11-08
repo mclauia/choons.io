@@ -203,6 +203,10 @@ export default connect(
     {
         persistNewTune: (tune) => (dispatch, getState) => {
             pushNewTune(tune, getState().user)
+            setTimeout(() => {
+                dispatch({ type: 'TUNE_SAVED' })
+                window.scrollTo(0, 0)
+            }, 250); // nice
         },
         pushRoute: push,
         goBack

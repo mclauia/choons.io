@@ -74,7 +74,13 @@ export default combineReducers({
             case '@@router/LOCATION_CHANGE':
                 return '';
             case 'TUNE_IMPORTED':
-                return 'Tune copied to your Choons list!'
+                return 'Choon copied to your Choons list!'
+            case 'TUNE_SAVED':
+                return 'Choon saved!'
+            case 'URL_COPIED':
+                return 'Copied URL to clipboard!'
+            case 'PUBLICNESS_CHANGED':
+                return `Choons are now ${action.payload ? 'public' : 'private'}!`
             default:
                 return state;
         }
