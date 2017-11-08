@@ -6,6 +6,7 @@ import {
     Button, FormGroup, FormControl, ControlLabel,
 } from 'react-bootstrap';
 import { push, goBack } from 'react-router-redux';
+import Autosuggest from 'react-bootstrap-autosuggest';
 
 import { updateTune } from '../../firebase';
 
@@ -71,7 +72,7 @@ class TuneEdit extends Component {
             <Row>
                 <Col xs={12} md={12}>
                     <h1>Edit {tune.name}</h1>
-                    <TuneNav back={true} view={tune.id} />
+                    <TuneNav back={true} view={tune.id} userId={this.props.userId} />
                     <FormGroup controlId="tuneName">
                         <ControlLabel>Name</ControlLabel>
                         {' '}
@@ -120,26 +121,28 @@ class TuneEdit extends Component {
                     <FormGroup controlId="tuneSource">
                         <ControlLabel>Source</ControlLabel>
                         {' '}
-                        <FormControl
+                        <Autosuggest
+                            datalist={this.props.sources}
+                            placeholder="so-and-so"
                             value={this.state.sourceValue}
                             type="text"
                             name="source"
-                            autoComplete={'on'}
-                            onChange={(e) => {
-                                this.setState({ sourceValue: e.target.value })
+                            onChange={(value) => {
+                                this.setState({ sourceValue: value })
                             }}
                         />
                     </FormGroup>
                     <FormGroup controlId="tuneSession">
                         <ControlLabel>Session</ControlLabel>
                         {' '}
-                        <FormControl
+                        <Autosuggest
+                            datalist={this.props.sessions}
+                            placeholder="that one session"
                             value={this.state.sessionValue}
                             type="text"
                             name="session"
-                            autoComplete={'on'}
-                            onChange={(e) => {
-                                this.setState({ sessionValue: e.target.value })
+                            onChange={(value) => {
+                                this.setState({ sessionValue: value })
                             }}
                         />
                     </FormGroup>
@@ -220,6 +223,8 @@ class TuneEdit extends Component {
 
 function mapAppStateToProps(state) {
     return {
+        sessions: state.sessions.toJS(),
+        sources: state.sources.toJS(),
         routePath: state.router.location.pathname
     }
 }

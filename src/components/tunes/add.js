@@ -7,6 +7,7 @@ import {
 } from 'react-bootstrap';
 import { push, goBack } from 'react-router-redux';
 import localStorage from 'local-storage';
+import Autosuggest from 'react-bootstrap-autosuggest';
 
 import { pushNewTune } from '../../firebase';
 
@@ -67,7 +68,7 @@ class TuneAdd extends Component {
             <Row>
                 <Col xs={12} md={12}>
                     <h1>Add a Choon</h1>
-                    <TuneNav back={true} />
+                    <TuneNav back={true} userId={this.props.userId} />
                     <FormGroup controlId="tuneName">
                         <ControlLabel>Name</ControlLabel>
                         {' '}
@@ -118,26 +119,30 @@ class TuneAdd extends Component {
                     <FormGroup controlId="tuneSource">
                         <ControlLabel>Source</ControlLabel>
                         {' '}
-                        <FormControl
+                        <Autosuggest
+                            datalist={this.props.sources}
+                            placeholder="so-and-so"
                             value={this.state.sourceValue}
                             type="text"
                             name="source"
-                            onChange={(e) => {
-                                this.setState({ sourceValue: e.target.value })
-                                localStorage.set(`CHOONS/newTune/source`, e.target.value)
+                            onChange={(value) => {
+                                this.setState({ sourceValue: value })
+                                localStorage.set(`CHOONS/newTune/source`, value)
                             }}
                         />
                     </FormGroup>
                     <FormGroup controlId="tuneSession">
                         <ControlLabel>Session</ControlLabel>
                         {' '}
-                        <FormControl
+                        <Autosuggest
+                            datalist={this.props.sessions}
+                            placeholder="that one session"
                             value={this.state.sessionValue}
                             type="text"
                             name="session"
-                            onChange={(e) => {
-                                this.setState({ sessionValue: e.target.value })
-                                localStorage.set(`CHOONS/newTune/session`, e.target.value)
+                            onChange={(value) => {
+                                this.setState({ sessionValue: value })
+                                localStorage.set(`CHOONS/newTune/session`, value)
                             }}
                         />
                     </FormGroup>
@@ -192,7 +197,10 @@ class TuneAdd extends Component {
 
 function mapAppStateToProps(state) {
     return {
-        routePath: state.router.location.pathname
+        routePath: state.router.location.pathname,
+        userId: 'my',
+        sessions: state.sessions.toJS(),
+        sources: state.sources.toJS(),
     }
 }
 

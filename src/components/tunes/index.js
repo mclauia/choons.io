@@ -157,7 +157,7 @@ class Tunes extends Component {
                          /> : null
                     )}/>
                     {isMine && <Route path={`/${userId}/tunes/edit/:tuneId`} render={({match:{params: {tuneId}}}) => (
-                        tunes.has(tuneId) ? <TuneEdit tune={tunes.get(tuneId)}/> : null
+                        tunes.has(tuneId) ? <TuneEdit tune={tunes.get(tuneId)} userId={userId} /> : null
                     )}/>}
                 </Col>}
             </Row>

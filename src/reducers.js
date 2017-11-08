@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
-import { Map } from 'immutable';
+import { Map, Set } from 'immutable';
 
 export default combineReducers({
     // stores route state
@@ -16,6 +16,30 @@ export default combineReducers({
                 return state;
         }
     },
+    sessions: (state = Set(), action) => {
+        switch (action.type) {
+            case 'GOT_TUNES':
+                return Object.values(action.payload).reduce(
+                    (set, tune) => tune.session ? set.add(tune.session) : set, Set()
+                );
+            case 'GOT_TUNE':
+                return action.payload.session ? state.add(action.payload.session) : state
+            default:
+                return state;
+        }
+    },
+    sources: (state = Set(), action) => {
+        switch (action.type) {
+            case 'GOT_TUNES':
+                return Object.values(action.payload).reduce(
+                    (set, tune) => tune.source ? set.add(tune.source) : set, Set()
+                );
+            case 'GOT_TUNE':
+                return action.payload.source ? state.add(action.payload.source) : state
+            default:
+                return state;
+        }
+    },
     readTunes: (state = Map({}), action) => {
         switch (action.type) {
             case 'GOT_READ_TUNES':
@@ -24,7 +48,7 @@ export default combineReducers({
                 return state;
         }
     },
-    user: (state = {}, action) => {
+    user: (state = '', action) => {
         switch (action.type) {
             case 'USER_AUTHED':
                 return action.payload;
