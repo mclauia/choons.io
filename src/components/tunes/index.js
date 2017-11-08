@@ -64,6 +64,32 @@ class Tunes extends Component {
 
         const tunes = isMine ? myTunes : readTunes;
 
+        const FilterSortRow = <div>
+            <Row>
+                <Col xs={12} md={4} className="pad-butt">
+                    <FilterWidget onFilterSelect={this.filterDown} sessions={sessions} sources={sources} />
+                </Col>
+                <Col xs={12} md={8}>
+                    <div className="pull-left pad-butt">
+                        <FilterFlags flags={''} onSelect={this.setFlags} />
+                    </div>
+                    <div className="pull-left pad-butt" style={{ marginLeft: 10 }}>
+                        <Button onClick={this.seePractice}>Practice History</Button>
+                    </div>
+                    <div className="pull-left pad-butt" style={{ marginLeft: 10 }}>
+                        <Button onClick={this.seeHistory}>Learnt History</Button>
+                    </div>
+                </Col>
+            </Row>
+            {!!filterCrumbs.length && <Row className="pad-butt">
+                <Col xs={12} md={8}>
+                    Recent: {filterCrumbs.map((crumb, i) => (
+                        <span key={i}>{i > 0 ? ' | ' : ''} <Link to={`${crumb.path}`}>{crumb.title}</Link></span>
+                    ))}
+                </Col>
+            </Row>}
+        </div>
+
         return (
             <Row>
                 {tunes && <Col xs={12} md={12}>
@@ -73,28 +99,7 @@ class Tunes extends Component {
                             <Row><Col xs={12} md={12}>
                                 <h1>{`${isMine ? 'All My' : 'All Their'}`} Choons</h1>
                                 <TuneNav userId={userId} add={isMine} />
-                                <Row className="pad-butt"><Col xs={12} md={4}>
-                                    <FilterWidget onFilterSelect={this.filterDown} sessions={sessions} sources={sources} />
-                                </Col><Col xs={12} md={8}>
-                                    <div className="pull-left">
-                                        <FilterFlags flags={''} onSelect={this.setFlags} />
-                                    </div>
-                                    {/*<div className="pull-left" style={{ marginLeft: 10 }}>
-                                        <FilterRealms onSelect={this.setRealms} />
-                                    </div>*/}
-                                    <div className="pull-left" style={{ marginLeft: 10 }}>
-                                        <Button onClick={this.seePractice}>Practice History</Button>
-                                    </div>
-                                    <div className="pull-left" style={{ marginLeft: 10 }}>
-                                        <Button onClick={this.seeHistory}>Learnt History</Button>
-                                    </div>
-                                </Col></Row>
-
-                                <Row className="pad-butt"><Col xs={12} md={8}>
-                                    Recent: {filterCrumbs.map((crumb, i) => (
-                                        <span key={i}>{i > 0 ? ' | ' : ''} <Link to={`/${userId}${crumb.path}`}>{crumb.title}</Link></span>
-                                    ))}
-                                </Col></Row>
+                                {FilterSortRow}
 
                                 <Typeahead
                                     onChange={(selections) => {
@@ -116,9 +121,9 @@ class Tunes extends Component {
                     }}/>
                     <Route path={`/${userId}/tunes/byFlag/:flags`} render={({ match:{ params: { flags } } }) => (
                         <div>
-                            <h1>Some Choons</h1>
+                            <h1>{flags} Choons</h1>
                             <TuneNav userId={userId} add={isMine} back={true} />
-                            <FilterFlags flags={flags} onSelect={this.setFlags} />
+                            {FilterSortRow}
                             <br />
                             <TunesTable
                                 userId={userId}
@@ -129,8 +134,9 @@ class Tunes extends Component {
                     )}/>
                     <Route path={`/${userId}/tunes/filter/:filterKey?/:filterValue?`} render={({ match:{ params: { filterKey, filterValue } } }) => (
                         <div>
-                            <h1>Some Choons</h1>
+                            <h1>{headerify(filterKey, filterValue)}</h1>
                             <TuneNav userId={userId} add={isMine} back={true} />
+                            {FilterSortRow}
                             <TunesTable
                                 userId={userId}
                                 tunes={sort(filter(tunes).byKey(filterKey, filterValue)).by('name')} filterKey={filterKey} filterValue={filterValue}
@@ -140,8 +146,9 @@ class Tunes extends Component {
                     )}/>
                     <Route path={`/${userId}/tunes/sort/:sortKey?/:sortDir?`} render={({match:{params: {sortKey, sortDir}}}) => (
                         <div>
-                            <h1>Some Choons</h1>
+                            <h1>Choons by {pretty(sortKey)}</h1>
                             <TuneNav userId={userId} add={isMine} back={true} />
+                            {FilterSortRow}
                             <TunesTable
                                 userId={userId}
                                 tunes={sort(tunes.filter((tune) => tune[sortKey])).by(sortKey, sortDir)} sortKey={sortKey}
@@ -249,3 +256,41 @@ export default connect(
         importTune
     }
 )(Tunes);
+
+function headerify(filterKey, filterValue) {
+    switch (filterKey) {
+        case 'type':
+            switch (filterValue) {
+                case 'reel': return 'Reels';
+                case 'hornpipe': return 'Hornpipes';
+                case 'jig': return 'Jigs';
+                case 'slide': return 'Slides';
+                case 'slipjig': return 'Slipjigs';
+                case 'waltz': return 'Waltzes';
+                case 'march': return 'Marches';
+                case 'air': return 'Airs';
+                case 'barndance': return 'Barndances';
+                case '7dance': return '7 Dances';
+                case 'gigue': return 'Gigues';
+            }
+        case 'musicKey':
+            return `Choons in ${filterValue}`;
+        case 'stage':
+            switch (filterValue) {
+                case 'learn': return 'Choons to Learn';
+                case 'drill': return 'Choons to Drill';
+                case 'enhance': return 'Choons to Work On';
+                case 'perform': return 'Choons to Perform';
+                case 'embellish': return 'Choons to Embellish';
+            }
+        case 'realm':
+            return `${pretty(filterValue)} Choons`;
+        case 'source':
+            return `Choons from ${filterValue}`;
+        case 'session':
+            return `Session Choons for ${filterValue}`;
+
+        default:
+            return ''
+    }
+}

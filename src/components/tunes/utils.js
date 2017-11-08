@@ -164,6 +164,9 @@ export function pretty(key) {
 pretty.texts = {
     lastPracticedTimestamp: 'Last Practiced',
     dateLearnt: 'Date Learnt',
+    dateAdded: 'Date Added',
+    source: 'Source',
+    session: 'Session',
 
     reel: 'Reel',
     hornpipe: 'Hornpipe',
