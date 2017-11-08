@@ -24,7 +24,6 @@ export function importTune(tune) {
         if (tune.musicKey) newTune.musicKey = tune.musicKey;
         if (tune.name) newTune.name = tune.name;
         if (tune.realm) newTune.realm = tune.realm;
-        if (tune.source) newTune.source = tune.source;
         if (tune.type) newTune.type = tune.type;
         if (tune.video) newTune.video = tune.video;
         if (tune.video2) newTune.video2 = tune.video2;

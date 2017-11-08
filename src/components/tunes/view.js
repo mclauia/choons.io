@@ -1,7 +1,7 @@
 // react bindings
 import React from 'react';
 import {
-    Table, OverlayTrigger, Tooltip, Button, Alert
+    Table, OverlayTrigger, Tooltip, Button, Alert, HelpBlock
 } from 'react-bootstrap';
 import format from 'date-fns/format';
 
@@ -31,6 +31,11 @@ export default function TuneView({ tune, userId, onImport }) {
         {isMine && <TunePractice tune={tune} />}
         {!isMine && <Alert>
             <h4>Know this one? Copy it to your choons~</h4>
+            <HelpBlock>
+                Importing a choon will copy over its non-personal metadata (composer, key, realm, abc).
+                <br />
+                Things like who you got it from, which sessions you play it at, or learning and practice data are up to you.
+            </HelpBlock>
             <Button bsStyle="success" onClick={() => onImport(tune)}>Import to My Choons</Button>
         </Alert>}
         <Table striped bordered hover responsive>
@@ -102,32 +107,32 @@ export default function TuneView({ tune, userId, onImport }) {
 export function TuneFlags({ tune }) {
     return <span>
         {wasPracticedRecently(tune) &&
-            <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasPracticedRecentlyTip">recently practiced</Tooltip>}>
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasPracticedRecentlyTip">practiced on {format(tune.lastPracticedTimestamp, 'MMMM Do YYYY')}</Tooltip>}>
                 <span role="img" aria-label="Practiced recently">🎻 </span>
             </OverlayTrigger>
         }
         {hasCobwebs(tune) &&
-            <OverlayTrigger placement="bottom" overlay={<Tooltip id="hasCobwebsTip">not recently practiced</Tooltip>}>
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="hasCobwebsTip">hasn't been practiced in {countCobwebs(tune)} weeks!</Tooltip>}>
                 <span>{Array(countCobwebs(tune)).fill().map((_, i) => <span key={i} role="img" aria-label="Hasn't been practiced recently">🕸</span>)}</span>
             </OverlayTrigger>
         }
         {wasAddedRecently(tune) &&
-            <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasAddedRecentlyTip">added recently</Tooltip>}>
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasAddedRecentlyTip">added on {format(tune.dateAdded, 'MMMM Do YYYY')}</Tooltip>}>
                 <span role="img" aria-label="Added recently">🌕 </span>
             </OverlayTrigger>
         }
         {wasLearntRecently(tune) &&
-            <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasLearntRecentlyTip">learnt recently</Tooltip>}>
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasLearntRecentlyTip">learnt on {format(tune.dateLearnt, 'MMMM Do YYYY')}</Tooltip>}>
                 <span role="img" aria-label="Learned recently">🔰 </span>
             </OverlayTrigger>
         }
         {wasForgotten(tune) &&
-            <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasForgottenTip">added, then forgotten</Tooltip>}>
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasForgottenTip">added on {format(tune.dateAdded, 'MMMM Do YYYY')}, but never learnt</Tooltip>}>
                 <span role="img" aria-label="Never got learned">🌑 </span>
             </OverlayTrigger>
         }
         {isPracticedALot(tune) &&
-            <OverlayTrigger placement="bottom" overlay={<Tooltip id="isPracticedALotTip">quite a fave</Tooltip>}>
+            <OverlayTrigger placement="bottom" overlay={<Tooltip id="isPracticedALotTip">quite a fave! practiced for {Math.round(tune.secondsPracticed / 60 / 60)} hours and counting!</Tooltip>}>
                 <span role="img" aria-label="Practiced a lot">⭐ </span>
             </OverlayTrigger>
         }
