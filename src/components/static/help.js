@@ -5,7 +5,7 @@ export default function Help() {
     return <Row className="pad-bottom">
         <Col xs={12} md={12}>
             <h1>What the Heck is This? <small>and what's a choon?</small></h1>
-            <p>A choon's a tune!</p>
+            <p>A choon's a tune! (inspired by Alasdair Fraser)</p>
             <p>Choons.io isn't a database of all choons ever.</p>
             <p>It's <strong>your</strong> database of the choons <strong>you</strong> know, or want to know, or are practicing.</p>
             <p>It's basically a personal choon archiving app where the really important metadata applies only to you:
@@ -59,6 +59,15 @@ export default function Help() {
                 <li>integrating recordings or playback</li>
             </ul>
             <p>If you have any other ideas, please lemme know!</p>
+
+            <h2>Who Are You Again?</h2>
+            <p>I'm Ian, and I am a fiddler. I was keeping track of my choons on a spreadsheet until I decided I wanted a little more control over the UI, so I made this.</p>
+
+            <h2>Privacy "Policy"</h2>
+            <p>This is a personal project, and it's hosted on Google's Firebase platform using my personal account, so take it with a grain of salt. </p>
+            <p>As the admin I'll be able to see who's using the app and have database access to all choons. There might be reasons I have to look in the database, e.g. for future data migration, but otherwise I'm not going to look at anyone's private choons lists or notes.</p>
+            <p>Technically Google also has access to all the data, and they're hosting it on whatever servers they please. So please don't enter your credit card or social security number or anything!</p>
+
         </Col>
     </Row>
 }
