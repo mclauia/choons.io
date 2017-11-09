@@ -47,6 +47,7 @@ class TuneEdit extends Component {
             type: this.state.typeValue,
             musicKey: this.state.musicKeyValue,
             realm: this.state.realmValue,
+            stage: this.state.stageValue,
             source: this.state.sourceValue,
             session: this.state.sessionValue,
             notes: this.state.notesValue,
