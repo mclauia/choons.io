@@ -29,6 +29,19 @@ export default combineReducers({
                 return state;
         }
     },
+    queue: (state = Map({}), action) => {
+        switch (action.type) {
+            case 'GOT_QUEUE':
+                return Map(action.payload);
+            case 'QUEUE_CHANGED':
+                return state.has(action.payload) ? state.delete(action.payload) : state.set(action.payload, true);
+            case 'DELETED_FROM_QUEUE':
+            console.log('delete',action.payload);
+                return state.delete(action.payload);
+            default:
+                return state;
+        }
+    },
     sessions: (state = Set(), action) => {
         switch (action.type) {
             case 'GOT_TUNES':

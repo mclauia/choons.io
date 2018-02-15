@@ -97,7 +97,10 @@ export default function TuneView({ tune, userId, onImport }) {
                 </tr>}
                 {!!tune.abc && <tr>
                     <td><strong>Hint</strong></td>
-                    <td><div id="tuneHint"></div></td>
+                    <td>
+                        <div id="tuneHint"></div>
+                        <div id="tuneHintMidi"></div>
+                    </td>
                 </tr>}
             </tbody>
         </Table>

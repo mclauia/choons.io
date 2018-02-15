@@ -20,7 +20,6 @@ const auth = firebase.auth();
 // });
 
 const DB = firebase.database();
-const TUNES = 'tunes';
 
 export function initAuthApp(dispatch) {
     auth.onAuthStateChanged(function(user) {
@@ -31,7 +30,7 @@ export function initAuthApp(dispatch) {
             DB.ref(`users/${user.uid}/public`).on('value', (snap) => {
                 dispatch({ type: 'GOT_PUBLICNESS', payload: snap.val() });
             })
-            const fireTunes = DB.ref(`users/${user.uid}/${TUNES}`);
+            const fireTunes = DB.ref(`users/${user.uid}/tunes`);
             fireTunes.once('value', (tunesListSnapshot) => {
                 const tunes = tunesListSnapshot.val();
 
@@ -46,7 +45,7 @@ export function initAuthApp(dispatch) {
             // })
             fireTunes.on('child_changed', (tuneSnapshot) => {
                 const nextTune = tuneSnapshot.val();
-                console.log('child_changed')
+                console.log('tunes child_changed')
                 dispatch({ type: 'GOT_TUNE', payload: nextTune })
             })
 
@@ -54,6 +53,25 @@ export function initAuthApp(dispatch) {
                 const deletedTune = tuneSnapshot.val();
                 console.log('child_removed')
                 dispatch({ type: 'DELETED_TUNE', payload: deletedTune })
+            })
+
+            const fireQueue = DB.ref(`users/${user.uid}/queue`);
+            fireQueue.once('value', (queueListSnapshot) => {
+                const queue = queueListSnapshot.val();
+
+                dispatch({ type: 'GOT_QUEUE', payload: queue })
+            })
+
+            fireQueue.on('child_changed', (idSnapshot) => {
+                const id = idSnapshot.key;
+                console.log('queue child_changed')
+                dispatch({ type: 'QUEUE_CHANGED', payload: id })
+            })
+
+            fireQueue.on('child_removed', (idSnapshot) => {
+                const id = idSnapshot.key;
+                console.log('child_removed')
+                dispatch({ type: 'DELETED_FROM_QUEUE', payload: id })
             })
 
             var connectedRef = DB.ref('.info/connected');
@@ -92,7 +110,7 @@ export function initAuthApp(dispatch) {
 }
 
 export function pushNewTune(tune, userId) {
-    const fireTunes = DB.ref(`users/${userId}/${TUNES}`);
+    const fireTunes = DB.ref(`users/${userId}/tunes`);
     const next = fireTunes.push();
     const tuneId = next.key;
 
@@ -104,13 +122,24 @@ export function pushNewTune(tune, userId) {
 }
 
 export function updateTune(tune, userId) {
-    const fireTune = DB.ref(`users/${userId}/${TUNES}/${tune.id}`);
+    const fireTune = DB.ref(`users/${userId}/tunes/${tune.id}`);
     fireTune.set(tune)
+}
+
+export function pushToQueue(tune, userId) {
+    const fireQueueTune = DB.ref(`users/${userId}/queue/${tune.id}`);
+    console.log('pushing ', tune.id)
+    fireQueueTune.set({ dateAdded: firebase.database.ServerValue.TIMESTAMP });
+}
+
+export function removeFromQueue(tune, userId) {
+    const fireQueueTune = DB.ref(`users/${userId}/queue/${tune.id}`);
+    fireQueueTune.remove()
 }
 
 export function getUserTuneList(userId) {
     return new Promise((resolve) => {
-        const fireTunes = DB.ref(`users/${userId}/${TUNES}`);
+        const fireTunes = DB.ref(`users/${userId}/tunes`);
         fireTunes.once('value', (tunesListSnapshot) => {
             const tunes = tunesListSnapshot.val();
 

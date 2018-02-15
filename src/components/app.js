@@ -5,6 +5,8 @@ import { Switch, Route, Redirect, Link, withRouter } from 'react-router-dom';
 import Tunes from './tunes';
 import TuneAdd from './tunes/add';
 
+import Queue from './tunes/queue';
+
 import ReadTunes from './tunes/read';
 import Help from './static/help';
 // import Practice from './practice';
@@ -16,7 +18,7 @@ import './app.css';
 
 export default withRouter(({ history }) => {
     const pathMatch = history.location.pathname.match(/^\/(.+)/);
-    const currentTab = pathMatch ? (pathMatch[1].includes('tunes') ? 'tunes' : pathMatch[1]) : 'tunes';
+    const currentTab = pathMatch ? (pathMatch[1].includes('tunes') ? 'my/tunes' : pathMatch[1]) : 'my/tunes';
     return (
         <div>
             <Navbar>
@@ -33,7 +35,8 @@ export default withRouter(({ history }) => {
                 <Row className="pad-bottom">
                     <Col xs={12} md={12}>
                         <Tabs id="ok" activeKey={currentTab} onSelect={(route) => history.push(`/${route}`)}>
-                            <Tab eventKey={'tunes'} title="Tunes" />
+                            <Tab eventKey={'my/tunes'} title="Tunes" />
+                            <Tab eventKey={'my/queue'} title="Queue" />
                             <Tab eventKey={'help'} title="Help" />
                         </Tabs>
                     </Col>
@@ -43,6 +46,7 @@ export default withRouter(({ history }) => {
                         <Switch>
                             <Route path="/my/tunes/add" component={TuneAdd} />
                             <Route path="/my/tunes" component={Tunes} />
+                            <Route path="/my/queue" component={Queue} />
                             <Route path="/:userId/tunes" component={Tunes} />
 
                             <Route path="/help" component={Help} />

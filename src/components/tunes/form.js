@@ -24,6 +24,7 @@ export function TuneTypeSelect(props) {
             <option value="barndance">Barndance</option>
             <option value="7dance">7 Dance</option>
             <option value="gigue">Gigue</option>
+            <option value="song">Song</option>
         </FormControl>
     )
 }
@@ -97,6 +98,7 @@ export function TuneHintEditor(props) {
         />
         {props.value && <Well>
             <div id="tuneHintPreview"></div>
+            <div id="tuneHintPreviewMidi"></div>
         </Well>}
         </div>
     )

@@ -20,7 +20,7 @@ import FilterWidget from './filter';
 import { filter, sort, pretty, formatTimestamp, getSortForFlags } from './utils';
 
 import { fetchReadList, importTune } from './read';
-import { updatePublicFlag } from '../../firebase';
+import { updatePublicFlag, updateTune, pushToQueue } from '../../firebase';
 
 class Tunes extends Component {
     state = {
@@ -165,6 +165,8 @@ class Tunes extends Component {
                                 <TunesTable
                                     userId={userId}
                                     onImport={this.props.importTune}
+                                    onPractice={this.props.addPractice}
+                                    onQueue={this.props.pushToQueue}
                                     tunes={sort(tunes).by('name')}
                                 />
                             </Col></Row>
@@ -181,6 +183,8 @@ class Tunes extends Component {
                                 userId={userId}
                                 tunes={sort(filter(tunes).byFlags(flags)).by(...getSortForFlags(flags))}
                                 onImport={this.props.importTune}
+                                onPractice={this.props.addPractice}
+                                onQueue={this.props.pushToQueue}
                             />
                         </div>
                     )}/>
@@ -193,6 +197,8 @@ class Tunes extends Component {
                                 userId={userId}
                                 tunes={sort(filter(tunes).byKey(filterKey, filterValue)).by('name')} filterKey={filterKey} filterValue={filterValue}
                                 onImport={this.props.importTune}
+                                onPractice={this.props.addPractice}
+                                onQueue={this.props.pushToQueue}
                             />
                         </div>
                     )}/>
@@ -205,6 +211,8 @@ class Tunes extends Component {
                                 userId={userId}
                                 tunes={sort(tunes.filter((tune) => tune[sortKey])).by(sortKey, sortDir)} sortKey={sortKey}
                                 onImport={this.props.importTune}
+                                onPractice={this.props.addPractice}
+                                onQueue={this.props.pushToQueue}
                             />
                         </div>
                     )}/>
@@ -246,7 +254,7 @@ const timestampKeys = [
     'dateAdded'
 ];
 
-function TunesTable({ tunes, filterKey, filterValue, sortKey, userId, onImport }) {
+function TunesTable({ tunes, filterKey, filterValue, sortKey, userId, onImport, onPractice, onQueue }) {
     const isMine = userId === 'my';
     const timestampColumn = timestampKeys.includes(sortKey) ? sortKey : null;
     return <Table striped bordered hover responsive>
@@ -267,6 +275,18 @@ function TunesTable({ tunes, filterKey, filterValue, sortKey, userId, onImport }
                 <tr key={tune.id}>
                     <td>{i+1}</td>
                     <td>
+                        {isMine && <Button
+                            bsStyle="success"
+                            style={{marginLeft: 5}}
+                            bsSize="small"
+                            className="pull-right"
+                            onClick={() => onPractice(tune)}>+1m</Button>}
+                        {isMine && <Button
+                            bsStyle="primary"
+                            style={{marginLeft: 5}}
+                            bsSize="small"
+                            className="pull-right"
+                            onClick={() => onQueue(tune)}><Glyphicon glyph="th-list" /></Button>}
                         {isMine && <Link to={`/${userId}/tunes/edit/${tune.id}`}>
                             <Button bsSize="small" className="pull-right">Edit</Button>
                         </Link>}
@@ -300,6 +320,7 @@ function headerify(filterKey, filterValue) {
                 case 'barndance': return 'Barndances';
                 case '7dance': return '7 Dances';
                 case 'gigue': return 'Gigues';
+                case 'song': return 'Songs';
             }
         case 'musicKey':
             return `Choons in ${filterValue}`;
@@ -373,6 +394,16 @@ export default connect(
         pushRoute: push,
         fetchReadList,
         importTune,
+        pushToQueue: (tune) => (dispatch, getState) => {
+            pushToQueue(tune, getState().user)
+        },
+        addPractice: (tune) => (dispatch, getState) => {
+            updateTune({
+                ...tune,
+                lastPracticedTimestamp: Date.now(),
+                secondsPracticed: tune.secondsPracticed + 60
+            }, getState().user)
+        },
         setPublic: (isPublic) => (dispatch, getState) => {
             updatePublicFlag(getState().user, isPublic);
             dispatch({ type: 'PUBLICNESS_CHANGED', payload: isPublic })

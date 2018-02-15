@@ -1,5 +1,7 @@
 /* global ABCJS */
 import format from 'date-fns/format';
+import 'abcjs/abcjs-midi.css';
+import 'font-awesome/css/font-awesome.css'
 
 export function formatTimestamp(timestamp, hour = true) {
     return format(timestamp, `MMMM Do YYYY${hour ? ', h:mm A' : ''}`);
@@ -127,6 +129,15 @@ export function renderAbcTo(abc, targetId) {
         // i have no idea how to interop this with react, sooo
         setTimeout(() => {
             console.log(ABCJS.renderAbc(targetId, abc, {}, { scale: 0.7 }))
+            console.log(ABCJS.renderMidi(targetId + 'Midi', abc, {
+                inlineControls: {
+                    selectionToggle: false,
+                    loopToggle: false,
+                    standard: true,
+                    tempo: false,
+                    startPlaying: false
+                }
+            }))
         }, 300)
     };
 }
@@ -179,6 +190,7 @@ pretty.texts = {
     barndance: 'Barndance',
     '7dance': '7 Dance',
     gigue: 'Gigue',
+    song: 'Song',
 
     irish: 'Irish',
     quebecois: 'Québécois',
