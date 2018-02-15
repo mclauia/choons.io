@@ -111,7 +111,7 @@ export function TuneFlags({ tune }) {
     return <span>
         {wasPracticedRecently(tune) &&
             <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasPracticedRecentlyTip">practiced on {format(tune.lastPracticedTimestamp, 'MMMM Do YYYY')}</Tooltip>}>
-                <span role="img" aria-label="Practiced recently">🎻 </span>
+                <span role="img" aria-label="Practiced recently">{tune.type === 'song' ? '🎙' : '🎻'} </span>
             </OverlayTrigger>
         }
         {hasCobwebs(tune) &&
