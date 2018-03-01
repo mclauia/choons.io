@@ -13,6 +13,14 @@ export default combineReducers({
                 return state;
         }
     },
+    areSpiders: (state = false, action) => {
+        switch (action.type) {
+            case 'GOT_SPIDERNESS':
+                return action.payload;
+            default:
+                return state;
+        }
+    },
     tunes: (state = Map({}), action) => {
         switch (action.type) {
             case 'GOT_TUNES':
@@ -94,6 +102,8 @@ export default combineReducers({
                 return 'Copied URL to clipboard!'
             case 'PUBLICNESS_CHANGED':
                 return `Choons are now ${action.payload ? 'public' : 'private'}!`
+            case 'SPIDERNESS_CHANGED':
+                return `Choons are now ${action.payload ? 'full of spiders' : 'spider-free'}!`
             default:
                 return state;
         }

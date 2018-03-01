@@ -41,6 +41,7 @@ export function TuneKeySelect(props) {
             <option value="E">E</option>
             <option value="Em">Em</option>
             <option value="F">F</option>
+            <option value="F#m">F#m 💩</option>
             <option value="Fm">Fm</option>
             <option value="G">G</option>
             <option value="Gm">Gm</option>

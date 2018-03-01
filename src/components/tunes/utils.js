@@ -124,11 +124,11 @@ export const filter = (tunes) => ({
     }
 })
 
-export function renderAbcTo(abc, targetId) {
+export function renderAbcTo(abc, targetId, options) {
     if (abc) {
         // i have no idea how to interop this with react, sooo
         setTimeout(() => {
-            console.log(ABCJS.renderAbc(targetId, abc, {}, { scale: 0.7 }))
+            console.log(ABCJS.renderAbc(targetId, abc, {}, { scale: 0.7, ...options }))
             console.log(ABCJS.renderMidi(targetId + 'Midi', abc, {
                 inlineControls: {
                     selectionToggle: false,

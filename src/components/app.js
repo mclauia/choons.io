@@ -1,11 +1,12 @@
 import React from 'react';
-import { Grid, Row, Col, Nav, NavItem, Navbar, Tabs, Tab } from 'react-bootstrap';
+import { Glyphicon, Grid, Row, Col, Nav, NavItem, Navbar, Tabs, Tab } from 'react-bootstrap';
 import { Switch, Route, Redirect, Link, withRouter } from 'react-router-dom';
 
 import Tunes from './tunes';
 import TuneAdd from './tunes/add';
 
 import Queue from './tunes/queue';
+import Settings from './tunes/settings';
 
 import ReadTunes from './tunes/read';
 import Help from './static/help';
@@ -35,9 +36,10 @@ export default withRouter(({ history }) => {
                 <Row className="pad-bottom">
                     <Col xs={12} md={12}>
                         <Tabs id="ok" activeKey={currentTab} onSelect={(route) => history.push(`/${route}`)}>
-                            <Tab eventKey={'my/tunes'} title="Tunes" />
-                            <Tab eventKey={'my/queue'} title="Queue" />
-                            <Tab eventKey={'help'} title="Help" />
+                            <Tab eventKey={'my/tunes'} title={<span><Glyphicon glyph="music" /> Tunes</span>} />
+                            <Tab eventKey={'my/queue'} title={<span><Glyphicon glyph="th-list" /> Queue</span>} />
+                            <Tab eventKey={'my/settings'} title={<span><Glyphicon glyph="cog" /> Settings</span>} />
+                            <Tab eventKey={'help'} title={<span><Glyphicon glyph="question-sign" /> Help</span>} />
                         </Tabs>
                     </Col>
                 </Row>
@@ -47,6 +49,7 @@ export default withRouter(({ history }) => {
                             <Route path="/my/tunes/add" component={TuneAdd} />
                             <Route path="/my/tunes" component={Tunes} />
                             <Route path="/my/queue" component={Queue} />
+                            <Route path="/my/settings" component={Settings} />
                             <Route path="/:userId/tunes" component={Tunes} />
 
                             <Route path="/help" component={Help} />

@@ -14,7 +14,7 @@ import { updateTune, removeFromQueue } from '../../firebase';
 
 class TuneQueue extends Component {
     render() {
-        const { tunes, addMinute, completeQueueItem } = this.props;
+        const { tunes, addMinute, completeQueueItem, areSpiders } = this.props;
         return (
             <Row>
                 <Col xs={12} md={12}>
@@ -45,7 +45,7 @@ class TuneQueue extends Component {
                                             bsSize="small"
                                             className="pull-right"
                                             onClick={() => completeQueueItem(tune)}><Glyphicon glyph="ok" /></Button>
-                                        <Link to={`/my/tunes/view/${tune.id}`}>{tune.name} <TuneFlags tune={tune} /></Link>
+                                        <Link to={`/my/tunes/view/${tune.id}`}>{tune.name} <TuneFlags tune={tune} spiders={areSpiders}/></Link>
                                     </td>
                                     <td>{pretty(tune.type)}</td>
                                     <td>{tune.musicKey}</td>
@@ -62,6 +62,7 @@ class TuneQueue extends Component {
 function mapAppStateToProps(state) {
     return {
         tunes: state.queue.map((_, key) => state.tunes.get(key) || {}),
+        areSpiders: state.areSpiders,
         routePath: state.router.location.pathname
     }
 }

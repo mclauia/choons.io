@@ -15,6 +15,7 @@
     "react": "^16.0.0",
     "react-bootstrap": "^0.31.3",
     "react-bootstrap-autosuggest": "^0.5.0",
+    "react-bootstrap-toggle": "^2.2.6",
     "react-bootstrap-typeahead": "^2.0.0-alpha.3",
     "react-confirm-bootstrap": "^4.0.0",
     "react-copy-to-clipboard": "^5.0.1",

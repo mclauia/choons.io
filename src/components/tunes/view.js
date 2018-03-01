@@ -1,7 +1,7 @@
 // react bindings
 import React from 'react';
 import {
-    Table, OverlayTrigger, Tooltip, Button, Alert, HelpBlock
+    Table, OverlayTrigger, Tooltip, Button, Alert, HelpBlock, Popover
 } from 'react-bootstrap';
 import format from 'date-fns/format';
 
@@ -20,13 +20,13 @@ import {
     countCobwebs
 } from './utils';
 
-export default function TuneView({ tune, userId, onImport }) {
+export default function TuneView({ tune, userId, onImport, spiders }) {
     renderAbcTo(tune.abc, 'tuneHint');
 
     const isMine = userId === 'my';
 
     return (<div>
-        <h1>{tune.name} <TuneFlags tune={tune} /></h1>
+        <h1>{tune.name} <TuneFlags tune={tune} spiders={spiders} /></h1>
         <TuneNav back={true} edit={tune.id} userId={userId} />
         {isMine && <TunePractice tune={tune} />}
         {!isMine && <Alert>
@@ -107,14 +107,23 @@ export default function TuneView({ tune, userId, onImport }) {
     </div>)
 }
 
-export function TuneFlags({ tune }) {
+export function TuneFlags({ tune, spiders }) {
     return <span>
+        {tune.abc &&
+            <OverlayTrigger delayShow={500} delayHide={500} placement="bottom" overlay={
+                <Popover id="popover-positioned-bottom" title="Hint">
+                    <TuneHintPopover tune={tune} />
+                </Popover>
+            }>
+                <span role="img" aria-label="Hint">🎼 </span>
+            </OverlayTrigger>
+        }
         {wasPracticedRecently(tune) &&
             <OverlayTrigger placement="bottom" overlay={<Tooltip id="wasPracticedRecentlyTip">practiced on {format(tune.lastPracticedTimestamp, 'MMMM Do YYYY')}</Tooltip>}>
                 <span role="img" aria-label="Practiced recently">{tune.type === 'song' ? '🎙' : '🎻'} </span>
             </OverlayTrigger>
         }
-        {hasCobwebs(tune) &&
+        {spiders && hasCobwebs(tune) &&
             <OverlayTrigger placement="bottom" overlay={<Tooltip id="hasCobwebsTip">hasn't been practiced in {countCobwebs(tune)} weeks!</Tooltip>}>
                 <span>{Array(countCobwebs(tune)).fill().map((_, i) => <span key={i} role="img" aria-label="Hasn't been practiced recently">🕸</span>)}</span>
             </OverlayTrigger>
@@ -140,4 +149,10 @@ export function TuneFlags({ tune }) {
             </OverlayTrigger>
         }
     </span>
+}
+
+export function TuneHintPopover({ tune }) {
+    renderAbcTo(tune.abc.slice(0,45), 'tuneHintPop', { staffwidth: '400px' });
+
+    return <div id="tuneHintPop"></div>
 }

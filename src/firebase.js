@@ -30,6 +30,9 @@ export function initAuthApp(dispatch) {
             DB.ref(`users/${user.uid}/public`).on('value', (snap) => {
                 dispatch({ type: 'GOT_PUBLICNESS', payload: snap.val() });
             })
+            DB.ref(`users/${user.uid}/spiders`).on('value', (snap) => {
+                dispatch({ type: 'GOT_SPIDERNESS', payload: snap.val() });
+            })
             const fireTunes = DB.ref(`users/${user.uid}/tunes`);
             fireTunes.once('value', (tunesListSnapshot) => {
                 const tunes = tunesListSnapshot.val();
@@ -151,4 +154,8 @@ export function getUserTuneList(userId) {
 export function updatePublicFlag(userId, isPublic) {
     const fireTune = DB.ref(`users/${userId}/public`);
     fireTune.set(isPublic)
+}
+export function updateSpidersFlag(userId, spiders) {
+    const fireTune = DB.ref(`users/${userId}/spiders`);
+    fireTune.set(spiders)
 }

@@ -20,7 +20,7 @@ import FilterWidget from './filter';
 import { filter, sort, pretty, formatTimestamp, getSortForFlags } from './utils';
 
 import { fetchReadList, importTune } from './read';
-import { updatePublicFlag, updateTune, pushToQueue } from '../../firebase';
+import { updateTune, pushToQueue } from '../../firebase';
 
 class Tunes extends Component {
     state = {
@@ -68,7 +68,8 @@ class Tunes extends Component {
             filterValue,
             message,
             sessions,
-            sources
+            sources,
+            areSpiders
         } = this.props;
 
         const isMine = userId === 'my';
@@ -84,7 +85,7 @@ class Tunes extends Component {
                 </Col>
                 <Col xs={12} md={8}>
                     <div className="pull-left pad-butt">
-                        <FilterFlags flags={''} onSelect={this.setFlags} />
+                        <FilterFlags flags={''} onSelect={this.setFlags} spiders={areSpiders} />
                     </div>
                     <div className="pull-left pad-butt" style={{ marginLeft: 10 }}>
                         <Button onClick={this.seePractice}>Practice History</Button>
@@ -122,33 +123,14 @@ class Tunes extends Component {
                                     <h4>{areTunesPublic ? <Glyphicon glyph="eye-open" /> : <Glyphicon glyph="eye-close" />}
                                     {' '}
                                     Choons are currently {areTunesPublic ? 'public' : 'private'}</h4>
-                                </Col><Col xs={12} md={6}><div className="pull-right">
-                                    {!areTunesPublic &&
-                                        <Button bsStyle="warning" onClick={() => {
-                                            this.props.setPublic(true);
-                                        }}>
-                                            Go Public
-                                        </Button>
-                                    }
-                                    {areTunesPublic &&
-                                        <div>
-                                            <CopyToClipboard
-                                                text={`${window.location.origin}/${currentUserId}/tunes`}
-                                                onCopy={() => this.props.copiedURL()}>
-                                                <Button bsStyle="info">
-                                                    <Glyphicon glyph="copy" /> My Public URL
-                                                </Button>
-                                            </CopyToClipboard>
-                                            {' '}
-                                            <Button bsStyle="warning" onClick={() => {
-                                                this.props.setPublic(false);
-                                            }}
-                                            >
-                                                Go Private
+                                    {areTunesPublic && <CopyToClipboard
+                                        text={`${window.location.origin}/${currentUserId}/tunes`}
+                                        onCopy={() => this.props.copiedURL()}>
+                                            <Button bsStyle="info">
+                                                <Glyphicon glyph="copy" /> My Public URL
                                             </Button>
-                                        </div>
-                                    }
-                                </div></Col></Row>}
+                                    </CopyToClipboard>}
+                                </Col></Row>}
                                 <TuneNav userId={userId} add={isMine} />
                                 {FilterSortRow}
 
@@ -163,6 +145,7 @@ class Tunes extends Component {
                                 />
                                 <br />
                                 <TunesTable
+                                    spiders={areSpiders}
                                     userId={userId}
                                     onImport={this.props.importTune}
                                     onPractice={this.props.addPractice}
@@ -180,6 +163,7 @@ class Tunes extends Component {
                             {FilterSortRow}
                             <br />
                             <TunesTable
+                                spiders={areSpiders}
                                 userId={userId}
                                 tunes={sort(filter(tunes).byFlags(flags)).by(...getSortForFlags(flags))}
                                 onImport={this.props.importTune}
@@ -194,6 +178,7 @@ class Tunes extends Component {
                             <TuneNav userId={userId} add={isMine} back={true} />
                             {FilterSortRow}
                             <TunesTable
+                                spiders={areSpiders}
                                 userId={userId}
                                 tunes={sort(filter(tunes).byKey(filterKey, filterValue)).by('name')} filterKey={filterKey} filterValue={filterValue}
                                 onImport={this.props.importTune}
@@ -208,6 +193,7 @@ class Tunes extends Component {
                             <TuneNav userId={userId} add={isMine} back={true} />
                             {FilterSortRow}
                             <TunesTable
+                                spiders={areSpiders}
                                 userId={userId}
                                 tunes={sort(tunes.filter((tune) => tune[sortKey])).by(sortKey, sortDir)} sortKey={sortKey}
                                 onImport={this.props.importTune}
@@ -218,6 +204,7 @@ class Tunes extends Component {
                     )}/>
                     <Route path={`/${userId}/tunes/view/:tuneId`} render={({match:{params: {tuneId}}}) => (
                         tunes.has(tuneId) ? <TuneView
+                            spiders={areSpiders}
                             tune={tunes.get(tuneId)}
                             userId={userId}
                             onImport={this.props.importTune}
@@ -233,7 +220,7 @@ class Tunes extends Component {
     }
 }
 
-function FilterFlags({ flags, onSelect }) {
+function FilterFlags({ flags, onSelect, spiders }) {
     return <ButtonToolbar>
         <ToggleButtonGroup type="checkbox"
             value={Array.from(flags)}
@@ -241,7 +228,7 @@ function FilterFlags({ flags, onSelect }) {
             <ToggleButton value={'🔰'}><span role="img" aria-label="Learned recently">🔰</span></ToggleButton>
             <ToggleButton value={'🎻'}><span role="img" aria-label="Practiced recently">🎻</span></ToggleButton>
             <ToggleButton value={'🌕'}><span role="img" aria-label="Added recently">🌕</span></ToggleButton>
-            <ToggleButton value={'🕸'}><span role="img" aria-label="Hasn't been practiced recently">🕸</span></ToggleButton>
+            {spiders && <ToggleButton value={'🕸'}><span role="img" aria-label="Hasn't been practiced recently">🕸</span></ToggleButton>}
             <ToggleButton value={'🌑'}><span role="img" aria-label="Never got learned">🌑</span></ToggleButton>
             <ToggleButton value={'⭐'}><span role="img" aria-label="Practiced a lot">⭐</span></ToggleButton>
         </ToggleButtonGroup>
@@ -254,7 +241,7 @@ const timestampKeys = [
     'dateAdded'
 ];
 
-function TunesTable({ tunes, filterKey, filterValue, sortKey, userId, onImport, onPractice, onQueue }) {
+function TunesTable({ tunes, spiders, filterKey, filterValue, sortKey, userId, onImport, onPractice, onQueue }) {
     const isMine = userId === 'my';
     const timestampColumn = timestampKeys.includes(sortKey) ? sortKey : null;
     return <Table striped bordered hover responsive>
@@ -291,7 +278,7 @@ function TunesTable({ tunes, filterKey, filterValue, sortKey, userId, onImport, 
                             <Button bsSize="small" className="pull-right">Edit</Button>
                         </Link>}
                         {!isMine && <Button bsSize="small" className="pull-right" onClick={() => onImport(tune)}>Import</Button>}
-                        <Link to={`/${userId}/tunes/view/${tune.id}`}>{tune.name} <TuneFlags tune={tune} /></Link>
+                        <Link to={`/${userId}/tunes/view/${tune.id}`}>{tune.name} <TuneFlags tune={tune} spiders={spiders}/></Link>
                     </td>
                     <td><Link to={`/${userId}/tunes/filter/type/${tune.type}`}>{pretty(tune.type)}</Link></td>
                     <td><Link to={`/${userId}/tunes/filter/musicKey/${tune.musicKey}`}>{tune.musicKey}</Link></td>
@@ -379,6 +366,7 @@ function mapAppStateToProps(state) {
         currentUserId: state.user,
         myTunes: state.tunes,
         areTunesPublic: state.areTunesPublic,
+        areSpiders: state.areSpiders,
         readTunes: userIdMatch ? state.readTunes.get(userId) : null,
         filterKey: filterMatch ? filterMatch[1] : null,
         filterValue: filterMatch ? filterMatch[2] : null,
@@ -401,12 +389,8 @@ export default connect(
             updateTune({
                 ...tune,
                 lastPracticedTimestamp: Date.now(),
-                secondsPracticed: tune.secondsPracticed + 60
+                secondsPracticed: tune.secondsPracticed ? tune.secondsPracticed + 60 : 60
             }, getState().user)
-        },
-        setPublic: (isPublic) => (dispatch, getState) => {
-            updatePublicFlag(getState().user, isPublic);
-            dispatch({ type: 'PUBLICNESS_CHANGED', payload: isPublic })
         },
         copiedURL: () => ({ type: 'URL_COPIED' })
     }
