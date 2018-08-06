@@ -21,6 +21,14 @@ export default combineReducers({
                 return state;
         }
     },
+    isSimplePractice: (state = false, action) => {
+        switch (action.type) {
+            case 'GOT_PRACTICENESS':
+                return action.payload;
+            default:
+                return state;
+        }
+    },
     tunes: (state = Map({}), action) => {
         switch (action.type) {
             case 'GOT_TUNES':

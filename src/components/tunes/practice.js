@@ -84,9 +84,13 @@ class TunePractice extends Component {
 
     render() {
         const { isPracticing, practiceStart, practiceEnd } = this.state;
-        const { lastPracticedTimestamp, secondsPracticed, dateLearnt } = this.props.tune;
+        const { isSimplePractice,
+            tune: { lastPracticedTimestamp, secondsPracticed, dateLearnt }
+        } = this.props;
 
-        return <Alert className="pad-butt">
+        if (isSimplePractice && dateLearnt) return null;
+
+        return <Alert className="pad-butt">{!isSimplePractice ? <div>
             {lastPracticedTimestamp && <p>You last practiced this on {formatTimestamp(lastPracticedTimestamp)}
                 {secondsPracticed && `, for a total of ${(secondsPracticed / 60).toFixed(2)} minutes`}
             </p>}
@@ -118,12 +122,16 @@ class TunePractice extends Component {
             {practiceEnd && <div>
                 <h3>You practiced for {((practiceEnd - practiceStart) / 1000 / 60).toFixed(2)} minutes!</h3>
             </div>}
-        </Alert>
+        </div> : <div>
+            <Button bsStyle="primary" onClick={this.persistLearnt}>i lernt it</Button>
+        </div>} </Alert>
     }
 }
 
 export default connect(
-    () => ({}),
+    (state) => ({
+        isSimplePractice: state.isSimplePractice
+    }),
     {
         persistTuneChanges: (tune) => (dispatch, getState) => {
             updateTune(tune, getState().user)

@@ -52,6 +52,7 @@ class TuneAdd extends Component {
             video: this.state.videoValue,
             notes: this.state.notesValue,
             stage: this.state.stageValue,
+            dateLearnt: this.state.stageValue === 'drill' ? Date.now() : null,
             abc: this.state.hintValue
         });
         this.props.goBack();

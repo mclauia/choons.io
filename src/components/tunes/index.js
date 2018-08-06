@@ -69,7 +69,8 @@ class Tunes extends Component {
             message,
             sessions,
             sources,
-            areSpiders
+            areSpiders,
+            isSimplePractice
         } = this.props;
 
         const isMine = userId === 'my';
@@ -107,7 +108,7 @@ class Tunes extends Component {
         return (
             <Row>
                 {tunes && !!tunes.size && <Col xs={12} md={12}>
-                    {message && <Alert>{message}</Alert>}
+                    {message && <Alert className="marg-head">{message}</Alert>}
                     <Route path={`/${userId}/tunes`} render={() => (
                       userId === currentUserId ? (
                         <Redirect to="/my/tunes"/>
@@ -146,11 +147,13 @@ class Tunes extends Component {
                                 <br />
                                 <TunesTable
                                     spiders={areSpiders}
+                                    isSimplePractice={isSimplePractice}
                                     userId={userId}
                                     onImport={this.props.importTune}
                                     onPractice={this.props.addPractice}
                                     onQueue={this.props.pushToQueue}
                                     tunes={sort(tunes).by('name')}
+                                    playlist={this.props.playlist}
                                 />
                             </Col></Row>
                         )
@@ -164,8 +167,10 @@ class Tunes extends Component {
                             <br />
                             <TunesTable
                                 spiders={areSpiders}
+                                isSimplePractice={isSimplePractice}
                                 userId={userId}
                                 tunes={sort(filter(tunes).byFlags(flags)).by(...getSortForFlags(flags))}
+                                playlist={this.props.playlist}
                                 onImport={this.props.importTune}
                                 onPractice={this.props.addPractice}
                                 onQueue={this.props.pushToQueue}
@@ -179,8 +184,10 @@ class Tunes extends Component {
                             {FilterSortRow}
                             <TunesTable
                                 spiders={areSpiders}
+                                isSimplePractice={isSimplePractice}
                                 userId={userId}
                                 tunes={sort(filter(tunes).byKey(filterKey, filterValue)).by('name')} filterKey={filterKey} filterValue={filterValue}
+                                playlist={this.props.playlist}
                                 onImport={this.props.importTune}
                                 onPractice={this.props.addPractice}
                                 onQueue={this.props.pushToQueue}
@@ -194,8 +201,10 @@ class Tunes extends Component {
                             {FilterSortRow}
                             <TunesTable
                                 spiders={areSpiders}
+                                isSimplePractice={isSimplePractice}
                                 userId={userId}
                                 tunes={sort(tunes.filter((tune) => tune[sortKey])).by(sortKey, sortDir)} sortKey={sortKey}
+                                playlist={this.props.playlist}
                                 onImport={this.props.importTune}
                                 onPractice={this.props.addPractice}
                                 onQueue={this.props.pushToQueue}
@@ -208,13 +217,14 @@ class Tunes extends Component {
                             tune={tunes.get(tuneId)}
                             userId={userId}
                             onImport={this.props.importTune}
+                            onQueue={() => this.props.pushToQueue(tunes.get(tuneId))}
                          /> : null
                     )}/>
                     {isMine && <Route path={`/${userId}/tunes/edit/:tuneId`} render={({match:{params: {tuneId}}}) => (
                         tunes.has(tuneId) ? <TuneEdit tune={tunes.get(tuneId)} userId={userId} /> : null
                     )}/>}
                 </Col>}
-                {(!tunes || !tunes.size) && <Col md={12}><h3>Starting Choons Engine... 🚂💨</h3></Col>}
+                {(!tunes || !tunes.size) && <Col md={12}><h3>Starting Choons Engine 🚂💨</h3></Col>}
             </Row>
         );
     }
@@ -241,9 +251,22 @@ const timestampKeys = [
     'dateAdded'
 ];
 
-function TunesTable({ tunes, spiders, filterKey, filterValue, sortKey, userId, onImport, onPractice, onQueue }) {
+function TunesTable({
+    tunes,
+    playlist,
+    spiders,
+    isSimplePractice,
+    filterKey,
+    filterValue,
+    sortKey,
+    userId,
+    onImport,
+    onPractice,
+    onQueue
+}) {
     const isMine = userId === 'my';
     const timestampColumn = timestampKeys.includes(sortKey) ? sortKey : null;
+
     return <Table striped bordered hover responsive>
         <thead>
             <tr>
@@ -262,16 +285,18 @@ function TunesTable({ tunes, spiders, filterKey, filterValue, sortKey, userId, o
                 <tr key={tune.id}>
                     <td>{i+1}</td>
                     <td>
-                        {isMine && <Button
+                        {isMine && !isSimplePractice && <Button
                             bsStyle="success"
                             style={{marginLeft: 5}}
                             bsSize="small"
                             className="pull-right"
                             onClick={() => onPractice(tune)}>+1m</Button>}
                         {isMine && <Button
+                            title="Add to Playlist"
                             bsStyle="primary"
                             style={{marginLeft: 5}}
                             bsSize="small"
+                            disabled={playlist.has(tune.id)}
                             className="pull-right"
                             onClick={() => onQueue(tune)}><Glyphicon glyph="th-list" /></Button>}
                         {isMine && <Link to={`/${userId}/tunes/edit/${tune.id}`}>
@@ -361,12 +386,15 @@ function mapAppStateToProps(state) {
     const userIdMatch = state.router.location.pathname.match(/\/(.+)\/tunes/);
     const filterMatch = state.router.location.pathname.match(/\/tunes\/filter\/(.+)\/(.+)/);
     const userId = userIdMatch ? userIdMatch[1] : 'my';
+
     return {
         userId,
         currentUserId: state.user,
         myTunes: state.tunes,
+        playlist: state.queue,
         areTunesPublic: state.areTunesPublic,
         areSpiders: state.areSpiders,
+        isSimplePractice: state.isSimplePractice,
         readTunes: userIdMatch ? state.readTunes.get(userId) : null,
         filterKey: filterMatch ? filterMatch[1] : null,
         filterValue: filterMatch ? filterMatch[2] : null,

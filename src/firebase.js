@@ -33,6 +33,9 @@ export function initAuthApp(dispatch) {
             DB.ref(`users/${user.uid}/spiders`).on('value', (snap) => {
                 dispatch({ type: 'GOT_SPIDERNESS', payload: snap.val() });
             })
+            DB.ref(`users/${user.uid}/simple`).on('value', (snap) => {
+                dispatch({ type: 'GOT_PRACTICENESS', payload: snap.val() });
+            })
             const fireTunes = DB.ref(`users/${user.uid}/tunes`);
             fireTunes.once('value', (tunesListSnapshot) => {
                 const tunes = tunesListSnapshot.val();
@@ -140,6 +143,31 @@ export function removeFromQueue(tune, userId) {
     fireQueueTune.remove()
 }
 
+export function appendToCurrentPlaylistSet(tune, userId) {
+    const firePlaylist = DB.ref(`users/${userId}/playlist`);
+    const next = firePlaylist.push();
+
+    next.set(tune.name);
+}
+
+export function moveCurrentSetToPlayed(userId) {
+    const firePlaylist = DB.ref(`users/${userId}/playlist`);
+    const firePlayedlist = DB.ref(`users/${userId}/playedlist`);
+    firePlaylist.once('value', (snap) => {
+        const set = snap.val();
+        const next = firePlayedlist.push();
+        next.set(set);
+        firePlaylist.remove();
+    })
+}
+
+export function clearPlaylists(userId) {
+    const firePlaylist = DB.ref(`users/${userId}/playlist`);
+    const firePlayedlist = DB.ref(`users/${userId}/playedlist`);
+    firePlaylist.remove();
+    firePlayedlist.remove();
+}
+
 export function getUserTuneList(userId) {
     return new Promise((resolve) => {
         const fireTunes = DB.ref(`users/${userId}/tunes`);
@@ -152,10 +180,14 @@ export function getUserTuneList(userId) {
 }
 
 export function updatePublicFlag(userId, isPublic) {
-    const fireTune = DB.ref(`users/${userId}/public`);
-    fireTune.set(isPublic)
+    const ref = DB.ref(`users/${userId}/public`);
+    ref.set(isPublic)
 }
 export function updateSpidersFlag(userId, spiders) {
-    const fireTune = DB.ref(`users/${userId}/spiders`);
-    fireTune.set(spiders)
+    const ref = DB.ref(`users/${userId}/spiders`);
+    ref.set(spiders)
+}
+export function updateSimplePracticeFlag(userId, isSimple) {
+    const ref = DB.ref(`users/${userId}/simple`);
+    ref.set(isSimple)
 }

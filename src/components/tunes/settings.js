@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-    Row, Col, Table, Button, Glyphicon
+    Row, Col, Table, Button, Glyphicon, Alert
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { TuneFlags } from './view'
@@ -13,7 +13,7 @@ import { pretty } from './utils';
 
 import { push, goBack } from 'react-router-redux';
 
-import { updatePublicFlag, updateSpidersFlag, updateTune, removeFromQueue } from '../../firebase';
+import { updatePublicFlag, updateSpidersFlag, updateSimplePracticeFlag, updateTune, removeFromQueue } from '../../firebase';
 
 class Settings extends Component {
     render() {
@@ -23,16 +23,27 @@ class Settings extends Component {
             completeQueueItem,
             currentUserId,
             areTunesPublic,
-            areSpiders
+            areSpiders,
+            isSimplePractice,
+            message
         } = this.props;
-
+        console.log({isSimplePractice})
         return (
             <Row>
                 <Col xs={12} md={12}>
+                    {message && <Alert className="marg-head">{message}</Alert>}
                     <h1>Settings</h1>
 
                     <Row className="pad-butt"><Col xs={12} md={6}>
                         <dl className="dl-horizontal">
+                            <dt className="pad-butt" ><label>Simple Practice</label></dt>
+                            <dd><Toggle on="Yes" off="No"
+                                active={isSimplePractice}
+                                onClick={() => {
+                                    isSimplePractice
+                                        ? this.props.setSimplePractice(false)
+                                        : this.props.setSimplePractice(true);
+                                }}/></dd>
                             <dt className="pad-butt" ><label>Spiders</label></dt>
                             <dd><Toggle on="Yes?" off="No"
                                 active={areSpiders}
@@ -50,26 +61,6 @@ class Settings extends Component {
 
                         </div>
                     </Col></Row>
-                    <Row className="pad-butt"><Col xs={12} md={6}>
-                        {!areTunesPublic &&
-                            <Button bsStyle="warning" onClick={() => {
-                                this.props.setPublic(true);
-                            }}>
-                                Go Public
-                            </Button>
-                        }
-                        {areTunesPublic &&
-                            <div>
-                                <Button bsStyle="warning" onClick={() => {
-                                    this.props.setPublic(false);
-                                }}
-                                >
-                                    Go Private
-                                </Button>
-                            </div>
-                        }
-                    </Col>
-                    </Row>
                 </Col>
             </Row>
         );
@@ -81,6 +72,8 @@ function mapAppStateToProps(state) {
         currentUserId: state.user,
         areTunesPublic: state.areTunesPublic,
         areSpiders: state.areSpiders,
+        isSimplePractice: state.isSimplePractice,
+        message: state.messages,
         routePath: state.router.location.pathname
     }
 }
@@ -95,6 +88,10 @@ export default connect(
         setSpiders: (spiders) => (dispatch, getState) => {
             updateSpidersFlag(getState().user, spiders);
             dispatch({ type: 'SPIDERNESS_CHANGED', payload: spiders })
+        },
+        setSimplePractice: (isSimple) => (dispatch, getState) => {
+            updateSimplePracticeFlag(getState().user, isSimple);
+            dispatch({ type: 'PRACTICENESS_CHANGED', payload: isSimple })
         },
         pushRoute: push,
         goBack,
