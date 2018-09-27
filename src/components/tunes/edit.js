@@ -8,7 +8,9 @@ import {
 import { push, goBack } from 'react-router-redux';
 import Autosuggest from 'react-bootstrap-autosuggest';
 
-import { updateTune } from '../../firebase';
+import { updateTune, deleteTune } from '../../firebase';
+
+import Confirm from 'react-confirm-bootstrap';
 
 import TuneNav from './nav'
 import { getDefaultHintFor } from './utils';
@@ -41,15 +43,18 @@ class TuneEdit extends Component {
     }
 
     persistTune() {
+        const { tune } = this.props;
+        const wasLearnedNow = this.state.stageValue === 'drill' && !this.state.dateLearnt;
+
         this.props.persistTuneChanges({
-            ...this.props.tune,
+            ...tune,
             name: this.state.tuneNameValue,
             aliases: this.state.aliasesValue,
             type: this.state.typeValue,
             musicKey: this.state.musicKeyValue,
             realm: this.state.realmValue,
             stage: this.state.stageValue,
-            dateLearnt: this.state.stageValue === 'drill' && !this.state.dateLearnt ? Date.now() : null,
+            dateLearnt: wasLearnedNow ? Date.now() : (tune.dateLearnt || null),
             source: this.state.sourceValue,
             session: this.state.sessionValue,
             notes: this.state.notesValue,
@@ -61,6 +66,12 @@ class TuneEdit extends Component {
             abc: this.state.hintValue,
         });
         this.props.goBack()
+    }
+
+    persistTuneDelete() {
+        const { tune } = this.props;
+        this.props.persistTuneDelete(tune);
+        this.props.pushRoute('/my/tunes/');
     }
 
     maybePrefillHint = () => {
@@ -229,6 +240,13 @@ class TuneEdit extends Component {
                             onFocus={this.maybePrefillHint}
                         />
                     </FormGroup>
+                    <Confirm
+                        onConfirm={() => { this.persistTuneDelete() }}
+                        body="Are you sure you want to delete this?"
+                        confirmText="Confirm Delete"
+                        title={`Deleting ${tune.name}`}>
+                        <Button className="pull-right" bsStyle="warning">Delete Choon</Button>
+                    </Confirm>
                     <Button bsStyle="success" onClick={() => { this.persistTune() }}>Save Changes</Button>
                 </Col>
             </Row>
@@ -250,7 +268,14 @@ export default connect(
         persistTuneChanges: (tune) => (dispatch, getState) => {
             updateTune(tune, getState().user);
             setTimeout(() => {
-                dispatch({ type: 'TUNE_SAVED' })
+                dispatch({ type: 'TUNE_SAVED', payload: tune })
+                window.scrollTo(0, 0)
+            }, 250); // nice
+        },
+        persistTuneDelete: (tune) => (dispatch, getState) => {
+            deleteTune(tune, getState().user);
+            setTimeout(() => {
+                dispatch({ type: 'TUNE_DELETED', payload: tune })
                 window.scrollTo(0, 0)
             }, 250); // nice
         },

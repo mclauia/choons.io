@@ -1,5 +1,6 @@
 // react bindings
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
     Table, OverlayTrigger, Tooltip, Button, Alert, HelpBlock, Popover
 } from 'react-bootstrap';

@@ -88,8 +88,8 @@ export function TuneStageSelect(props) {
             {...props}
         >
             <option value="">-- Choose Stage --</option>
-            <option value="learn">Learn -- don't know the fingers</option>
-            <option value="enhance">Work on it -- just missing some fingers</option>
+            <option value="learn">Learn -- don't know the tune</option>
+            <option value="enhance">Work on it -- don't have the fingers down</option>
             <option value="drill">Drill it -- play it a thousand times</option>
             <option value="perform">Perform it -- you got this</option>
         </FormControl>

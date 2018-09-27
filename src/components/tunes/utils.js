@@ -128,8 +128,8 @@ export function renderAbcTo(abc, targetId, options) {
     if (abc) {
         // i have no idea how to interop this with react, sooo
         setTimeout(() => {
-            console.log(ABCJS.renderAbc(targetId, abc, {}, { scale: 0.7, ...options }))
-            console.log(ABCJS.renderMidi(targetId + 'Midi', abc, {
+            ABCJS.renderAbc(targetId, abc, {}, { scale: 0.7, ...options })
+            ABCJS.renderMidi(targetId + 'Midi', abc, {
                 inlineControls: {
                     selectionToggle: false,
                     loopToggle: false,
@@ -137,7 +137,7 @@ export function renderAbcTo(abc, targetId, options) {
                     tempo: false,
                     startPlaying: false
                 }
-            }))
+            })
         }, 300)
     };
 }
@@ -181,7 +181,7 @@ pretty.texts = {
 
     reel: 'Reel',
     hornpipe: 'Hornpipe',
-    jig: 'Jig /',
+    jig: 'Jig / 6/8',
     slide: 'Slide',
     slipjig: 'Slipjig',
     waltz: 'Waltz',

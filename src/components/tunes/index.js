@@ -7,6 +7,7 @@ import {
     Button, Alert, Glyphicon, HelpBlock,
     Row, Col, Table,
     ButtonToolbar, ToggleButtonGroup, ToggleButton,
+    OverlayTrigger, Tooltip
 } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -119,11 +120,16 @@ class Tunes extends Component {
                     <Route exact path={`/${userId}/tunes`} render={(props) => {
                         return (
                             <Row><Col xs={12} md={12}>
-                                <h1>{`${isMine ? 'All My' : 'All Their'}`} Choons</h1>
+                                <h1>{`${isMine ? 'All My' : 'All Their'}`} Choons {
+                                    areTunesPublic
+                                        ? <OverlayTrigger placement="bottom" overlay={<Tooltip id="publicEye">Choons are currently public</Tooltip>}>
+                                            <small><Glyphicon glyph="eye-open" /></small>
+                                        </OverlayTrigger> : <OverlayTrigger placement="bottom" overlay={<Tooltip id="publicEye">Choons are currently private</Tooltip>}>
+                                            <small><Glyphicon glyph="eye-close" /></small>
+                                        </OverlayTrigger>
+                                    }
+                                </h1>
                                 {isMine && <Row className="pad-butt"><Col xs={12} md={6}>
-                                    <h4>{areTunesPublic ? <Glyphicon glyph="eye-open" /> : <Glyphicon glyph="eye-close" />}
-                                    {' '}
-                                    Choons are currently {areTunesPublic ? 'public' : 'private'}</h4>
                                     {areTunesPublic && <CopyToClipboard
                                         text={`${window.location.origin}/${currentUserId}/tunes`}
                                         onCopy={() => this.props.copiedURL()}>

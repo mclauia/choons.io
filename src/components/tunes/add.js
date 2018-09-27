@@ -55,7 +55,7 @@ class TuneAdd extends Component {
             dateLearnt: this.state.stageValue === 'drill' ? Date.now() : null,
             abc: this.state.hintValue
         });
-        this.props.goBack();
+        this.props.pushRoute('/my/tunes/byFlag/🌕');
     }
 
     maybePrefillHint = () => {
@@ -203,9 +203,9 @@ export default connect(
     mapAppStateToProps,
     {
         persistNewTune: (tune) => (dispatch, getState) => {
-            pushNewTune(tune, getState().user)
+            const newTuneId = pushNewTune(tune, getState().user)
             setTimeout(() => {
-                dispatch({ type: 'TUNE_SAVED' })
+                dispatch({ type: 'TUNE_SAVED', payload: { ...tune, id: newTuneId } })
                 window.scrollTo(0, 0)
             }, 250); // nice
         },

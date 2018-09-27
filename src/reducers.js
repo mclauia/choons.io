@@ -1,5 +1,7 @@
+import React from 'react';
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
+import { Link } from 'react-router-dom';
 import { Map, Set } from 'immutable';
 
 export default combineReducers({
@@ -105,7 +107,11 @@ export default combineReducers({
             case 'TUNE_IMPORTED':
                 return 'Choon copied to your Choons list!'
             case 'TUNE_SAVED':
-                return 'Choon saved!'
+                // jaaaaaanky but functional
+                return <p>Choon "{ action.payload.name }" saved! <Link to={`/my/tunes/view/${action.payload.id}`}>View</Link></p>;
+            case 'TUNE_DELETED':
+                // jaaaaaanky but functional
+                return `Choon "${action.payload.name }" deleted!` // maybe could add an undo here; the tune is in the payload
             case 'URL_COPIED':
                 return 'Copied URL to clipboard!'
             case 'PUBLICNESS_CHANGED':

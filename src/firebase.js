@@ -125,11 +125,18 @@ export function pushNewTune(tune, userId) {
         id: tuneId,
         dateAdded: firebase.database.ServerValue.TIMESTAMP,
     });
+
+    return tuneId;
 }
 
 export function updateTune(tune, userId) {
     const fireTune = DB.ref(`users/${userId}/tunes/${tune.id}`);
     fireTune.set(tune)
+}
+
+export function deleteTune(tune, userId) {
+    const fireTune = DB.ref(`users/${userId}/tunes/${tune.id}`);
+    fireTune.remove()
 }
 
 export function pushToQueue(tune, userId) {

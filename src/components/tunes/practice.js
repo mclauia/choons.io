@@ -82,6 +82,18 @@ class TunePractice extends Component {
         this.endPractice(true);
     }
 
+    persistLearntSimple = () => {
+        const { tune } = this.props;
+        const nextTune = {
+            ...tune,
+            lastPracticedTimestamp: Date.now(),
+        };
+        nextTune.dateLearnt = Date.now();
+        nextTune.stage = 'drill';
+        this.props.persistTuneChanges(nextTune)
+
+    }
+
     render() {
         const { isPracticing, practiceStart, practiceEnd } = this.state;
         const { isSimplePractice,
@@ -123,7 +135,7 @@ class TunePractice extends Component {
                 <h3>You practiced for {((practiceEnd - practiceStart) / 1000 / 60).toFixed(2)} minutes!</h3>
             </div>}
         </div> : <div>
-            <Button bsStyle="primary" onClick={this.persistLearnt}>i lernt it</Button>
+            <Button bsStyle="primary" onClick={this.persistLearntSimple}>i lernt it</Button>
         </div>} </Alert>
     }
 }
